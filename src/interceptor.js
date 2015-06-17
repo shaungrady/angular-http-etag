@@ -15,16 +15,16 @@ function httpEtagInterceptorFactory (queryStringify) {
   }
 
 
-  // Determines if an etag has already been seen for this request config and,
-  // if it has, sets 'If-None-Match' header to that etag value.
+  // Determines if an etag has already been seen for this request config or if
+  // an etag has been passed and if it has, sets 'If-None-Match' header to that etag value.
   function requestInterceptor (config) {
-    if (config.etag === true && (config.method == 'GET' || config.method == 'JSONP')) {
-      var queryString = queryStringify(config.params);
-      var url = buildUrl(config.url, config.params);
+    if (config.etag && (config.method == 'GET' || config.method == 'JSONP')) {
+      var url  = buildUrl(config.url, config.params);
+      var etag = typeof(config.etag) == 'string' ? config.etag : etagCache[url];
 
-      if (etagCache[url])
+      if (etag)
         config.headers = angular.extend({}, config.headers, {
-          'If-None-Match': etagCache[url]
+          'If-None-Match': etag
         });
     }
     return config;
@@ -33,7 +33,7 @@ function httpEtagInterceptorFactory (queryStringify) {
 
   // If configured to use etags, store the returned etag in memory.
   function responseInterceptor (response) {
-    if (response.config.etag === true) {
+    if (response.config.etag) {
       var url = buildUrl(response.config.url, response.config.params);
       etagCache[url] = response.headers().etag;
     }
