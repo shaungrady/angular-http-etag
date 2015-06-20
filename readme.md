@@ -3,7 +3,7 @@ Adds ETag support to the `$http` service.
 
 
 ## Installation
-`$ npm install angular-credit-cards`
+`$ npm install angular-http-etag`
 
 
 ## Setup
@@ -81,7 +81,7 @@ $http.get('/', {
 ```
 
 ### Use Your Own $cacheFactory Cache
-If you'd like ETag and response data to be cached in your own $cacheFactory cache automatically. This is useful for sharing cached response data across controllers.
+If you'd like ETag and response data to be cached in your own $cacheFactory cache automatically. This is useful for sharing cached response data across controllers and in distinct caches.
 
 ``` javascript
 // Our own LRU cache
@@ -99,13 +99,13 @@ $http.get('/users/77.json', {
       }
     }
   })
-  .success(function (data, status, headers) {
+  .success(function (data) {
     userData = data;
   })
   .error(function (data, status) {
     if (status === 304 && !userData) {
       userData = cache.get(77);
-      // ETag data is also stored in the cached data  on the `$$etag` property.
+      // ETag data is also stored in the cached data on the `$$etag` property.
       console.log('Not modified. Used ETag', userData.$$etag);
     }
   })
