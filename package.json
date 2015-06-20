@@ -1,6 +1,6 @@
 {
   "name": "angular-http-etag",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Angular $http interceptor enabling use of ETags",
   "homepage": "https://github.com/shaungrady/angular-http-etag#readme",
   "author": "Shaun Grady",
