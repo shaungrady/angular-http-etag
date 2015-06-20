@@ -81,7 +81,7 @@ $http.get('/', {
 ```
 
 ### Use Your Own $cacheFactory Cache
-If you'd like ETag and response data to be cached in your own $cacheFactory cache automatically. This is useful for sharing cached response data across controllers and in distinct caches.
+If you'd like ETag and response data to be cached in your own $cacheFactory cache automatically. This is useful for sharing cached response data across controllers and in distinct caches. On 304 "errors", your cached data will be supplied in the `data` argument.
 
 ``` javascript
 // Our own LRU cache
@@ -103,10 +103,9 @@ $http.get('/users/77.json', {
     userData = data;
   })
   .error(function (data, status) {
-    if (status === 304 && !userData) {
-      userData = cache.get(77);
-      // ETag data is also stored in the cached data on the `$$etag` property.
-      console.log('Not modified. Used ETag', userData.$$etag);
+    if (status == 304 && !userData) {
+      // data is provided from 'myCache' $cacheFactory.
+      userData = data;
     }
   })
 ```
