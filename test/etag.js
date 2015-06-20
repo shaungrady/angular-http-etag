@@ -24,8 +24,8 @@ describe('angular-http-etag', function () {
     $cacheFactory = $injector.get('$cacheFactory');
     interceptor   = $injector.get('httpEtagInterceptor');
 
-    onSuccess = spy(angular.noop);
-    onError   = spy(angular.noop);
+    onSuccess = spy('$http().success', angular.noop);
+    onError   = spy('$http().error',   angular.noop);
 
     ifEtagIs = function (etag) {
       return function (headers) { return headers['If-None-Match'] === etag; };
@@ -126,6 +126,34 @@ describe('angular-http-etag', function () {
 
     onSuccess.should.have.been.called();
     onError.should.have.been.called();
+  });
+
+
+  it('should return user\'s $cacheFactory data on 304', function () {
+    var cachedData;
+
+    $http.get('/1.json', {
+        etag: { cache: { id:'test', key:1 } }
+      })
+      .success(onSuccess);
+    $httpBackend.flush();
+
+    userCache.get(1).$$etag.should.equal('1');
+
+    $http.get('/1.json', {
+        etag: { cache: { id:'test', key:1 } }
+      })
+      .error(function (data) {
+        cachedData = data;
+      });
+    $httpBackend.flush();
+
+    onSuccess.should.have.been.called();
+    cachedData.should.deep.equal({
+      $$etag: '1',
+      id: 1,
+      content: 'Test data'
+    });
   });
 
 
