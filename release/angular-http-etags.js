@@ -70,9 +70,9 @@ function httpEtagModuleConfig ($httpProvider) {
 var angular = (typeof window !== "undefined" ? window.angular : typeof global !== "undefined" ? global.angular : null);
 module.exports = httpEtagInterceptorFactory;
 
-httpEtagInterceptorFactory.$inject = ['$cacheFactory', 'queryStringify'];
+httpEtagInterceptorFactory.$inject = ['$q', '$cacheFactory', 'queryStringify'];
 
-function httpEtagInterceptorFactory ($cacheFactory, queryStringify) {
+function httpEtagInterceptorFactory ($q, $cacheFactory, queryStringify) {
   var defaultCache = $cacheFactory('httpEtag');
 
   function buildUrlKey (url, params) {
@@ -81,23 +81,30 @@ function httpEtagInterceptorFactory ($cacheFactory, queryStringify) {
     return url;
   }
 
+  function getCacheFactoryData (cacheId, cacheKey) {
+    if (angular.isDefined(cacheId) && angular.isDefined(cacheKey)) {
+      var cache     = $cacheFactory.get(cacheId),
+          cacheData = cache ? cache.get(cacheKey) : undefined;
+      return cacheData;
+    }
+  }
+
 
   // Request
-  function requestInterceptor (config) {
+  function etagRequestInterceptor (config) {
     if (!config.etag || !(config.method == 'GET' || config.method == 'JSONP'))
       return config;
 
-    var etag, key, cache, cacheData;
+    var etag, key, cacheData;
 
     switch (typeof config.etag) {
       // Using user-provided cache
       case 'object':
-        cache     = $cacheFactory.get(config.etag.cache.id);
-        cacheData = cache ? cache.get(config.etag.cache.key) : undefined;
-        etag      = typeof(cacheData) == 'object' ? cacheData.$$etag : undefined;
+        cacheData = getCacheFactoryData(config.etag.cache.id, config.etag.cache.key);
+        etag      = angular.isObject(cacheData) ? cacheData.$$etag : undefined;
         break;
 
-      // Using user-provided etag string, fall through to provide caching
+      // Using user-provided etag string, fall through to provide ETag caching
       case 'string':
         etag = config.etag;
 
@@ -105,7 +112,7 @@ function httpEtagInterceptorFactory ($cacheFactory, queryStringify) {
       case 'boolean':
         key  = buildUrlKey(config.url, config.params);
         etag = etag || defaultCache.get(key);
-        config.$$etagCacheKey = key;
+        config.$$etagDefaultCacheKey = key;
     }
 
     if (etag)
@@ -118,7 +125,7 @@ function httpEtagInterceptorFactory ($cacheFactory, queryStringify) {
 
 
   // Response
-  function responseInterceptor (response) {
+  function etagResponseInterceptor (response) {
     if (!response.config.etag)
       return response;
 
@@ -130,7 +137,7 @@ function httpEtagInterceptorFactory ($cacheFactory, queryStringify) {
       case 'object':
         cache    = $cacheFactory.get(config.etag.cache.id);
         cacheKey = config.etag.cache.key;
-        if (!cache || typeof(response.data) != 'object')
+        if (!cache || !angular.isObject(response.data))
           return response;
         response.data.$$etag = etag;
         cacheValue = response.data;
@@ -139,9 +146,9 @@ function httpEtagInterceptorFactory ($cacheFactory, queryStringify) {
       case 'string':
       case 'boolean':
         cache      = defaultCache;
-        cacheKey   = config.$$etagCacheKey;
+        cacheKey   = config.$$etagDefaultCacheKey;
         cacheValue = etag;
-        delete config.$$etagCacheKey;
+        delete config.$$etagDefaultCacheKey;
     }
 
     cache.put(cacheKey, cacheValue);
@@ -150,9 +157,27 @@ function httpEtagInterceptorFactory ($cacheFactory, queryStringify) {
   }
 
 
+  // Response Error
+  function etagResponseErrorInterceptor (rejection) {
+    var etagConfig = rejection.config.etag,
+        cacheData;
+
+    if (rejection.status == 304 && etagConfig && etagConfig.cache) {
+
+
+      cacheData = getCacheFactoryData(etagConfig.cache.id, etagConfig.cache.key);
+      if (angular.isDefined(cacheData))
+        rejection.data = cacheData;
+    }
+
+    return $q.reject(rejection);
+  }
+
+
   return {
-    request:  requestInterceptor,
-    response: responseInterceptor
+    request:       etagRequestInterceptor,
+    response:      etagResponseInterceptor,
+    responseError: etagResponseErrorInterceptor
   };
 }
 
