@@ -3,40 +3,81 @@
 var angular = require('angular');
 module.exports = httpEtagInterceptorFactory;
 
-httpEtagInterceptorFactory.$inject = ['queryStringify'];
+httpEtagInterceptorFactory.$inject = ['$cacheFactory', 'queryStringify'];
 
-function httpEtagInterceptorFactory (queryStringify) {
-  var etagCache = {};
+function httpEtagInterceptorFactory ($cacheFactory, queryStringify) {
+  var defaultCache = $cacheFactory('httpEtag');
 
-  function buildUrl (url, params) {
+  function buildUrlKey (url, params) {
     var queryString = queryStringify(params);
     url += ((url.indexOf('?') == -1) ? '?' : '&') + queryString;
     return url;
   }
 
 
-  // Determines if an etag has already been seen for this request config or if
-  // an etag has been passed and if it has, sets 'If-None-Match' header to that etag value.
+  // Request
   function requestInterceptor (config) {
-    if (config.etag && (config.method == 'GET' || config.method == 'JSONP')) {
-      var url  = buildUrl(config.url, config.params);
-      var etag = typeof(config.etag) == 'string' ? config.etag : etagCache[url];
+    if (!config.etag || !(config.method == 'GET' || config.method == 'JSONP'))
+      return config;
 
-      if (etag)
-        config.headers = angular.extend({}, config.headers, {
-          'If-None-Match': etag
-        });
+    var etag, key, cache, cacheData;
+
+    switch (typeof config.etag) {
+      // Using user-provided cache
+      case 'object':
+        cache     = $cacheFactory.get(config.etag.cache.id);
+        cacheData = cache ? cache.get(config.etag.cache.key) : undefined;
+        etag      = typeof(cacheData) == 'object' ? cacheData.$$etag : undefined;
+        break;
+
+      // Using user-provided etag string, fall through to provide caching
+      case 'string':
+        etag = config.etag;
+
+      // Using default cache
+      case 'boolean':
+        key  = buildUrlKey(config.url, config.params);
+        etag = etag || defaultCache.get(key);
+        config.$$etagCacheKey = key;
     }
+
+    if (etag)
+      config.headers = angular.extend({}, config.headers, {
+        'If-None-Match': etag
+      });
+
     return config;
   }
 
 
-  // If configured to use etags, store the returned etag in memory.
+  // Response
   function responseInterceptor (response) {
-    if (response.config.etag) {
-      var url = buildUrl(response.config.url, response.config.params);
-      etagCache[url] = response.headers().etag;
+    if (!response.config.etag)
+      return response;
+
+    var config = response.config,
+        etag   = response.headers().etag,
+        cache, cacheKey, cacheValue;
+
+    switch (typeof config.etag) {
+      case 'object':
+        cache    = $cacheFactory.get(config.etag.cache.id);
+        cacheKey = config.etag.cache.key;
+        if (!cache || typeof(response.data) != 'object')
+          return response;
+        response.data.$$etag = etag;
+        cacheValue = response.data;
+        break;
+
+      case 'string':
+      case 'boolean':
+        cache      = defaultCache;
+        cacheKey   = config.$$etagCacheKey;
+        cacheValue = etag;
+        delete config.$$etagCacheKey;
     }
+
+    cache.put(cacheKey, cacheValue);
 
     return response;
   }
