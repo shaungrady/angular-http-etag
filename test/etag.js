@@ -15,15 +15,15 @@ require('angular-mocks/ngMock');
 describe('angular-http-etag', function () {
   beforeEach(angular.mock.module(require('../')));
 
-  var $http, $httpBackend, $cacheFactory, userCache,
-      interceptor, ifEtagIs, ifEtagIsNot, onSuccess, onError;
+  var $http, $httpBackend, $cacheFactory, serverData,
+      ifEtagIs, ifEtagIsNot, onCache, onSuccess, onError;
 
   beforeEach(angular.mock.inject(function ($injector) {
     $http         = $injector.get('$http');
     $httpBackend  = $injector.get('$httpBackend');
     $cacheFactory = $injector.get('$cacheFactory');
-    interceptor   = $injector.get('httpEtagInterceptor');
 
+    onCache   = spy('$http().cache',   angular.noop);
     onSuccess = spy('$http().success', angular.noop);
     onError   = spy('$http().error',   angular.noop);
 
@@ -35,18 +35,18 @@ describe('angular-http-etag', function () {
       return function (headers) { return headers['If-None-Match'] !== etag; };
     };
 
-    userCache = $cacheFactory('test');
+    serverData = { id:1, content:'Test data' };
 
     $httpBackend
       .whenGET('/1.json', ifEtagIsNot('1'))
-      .respond({ id:1, content:'Test data' }, { 'etag': '1' });
+      .respond(serverData, { 'etag': '1' });
     $httpBackend
       .whenGET('/1.json', ifEtagIs('1'))
       .respond(304);
 
     $httpBackend
       .whenGET('/1.json?param=test', ifEtagIsNot('1'))
-      .respond({ id:1, content:'Test data' }, { 'etag': '1' });
+      .respond(serverData, { 'etag': '1' });
     $httpBackend
       .whenGET('/1.json?param=test', ifEtagIs('1'))
       .respond(304);
@@ -69,7 +69,26 @@ describe('angular-http-etag', function () {
   });
 
 
-  it('should function without ETag config property', function () {
+  it('should cache data', function () {
+    var userData;
+
+    $http.get('/1.json', { etag: true })
+      .success(onSuccess);
+    $httpBackend.flush();
+
+    $http.get('/1.json', { etag: true })
+      .cache(function (data) {
+        userData = data;
+      })
+      .error(onError);
+    $httpBackend.flush();
+
+    userData.should.deep.equal(serverData);
+    onError.should.have.been.called();
+  });
+
+
+  it('should function normally without ETag config property', function () {
     $http.get('/1.json').success(onSuccess);
     $httpBackend.flush();
 
@@ -92,85 +111,6 @@ describe('angular-http-etag', function () {
 
     onSuccess.should.have.been.called();
     onError.should.have.been.called();
-  });
-
-
-  it('should allow for passing of an ETag string', function () {
-    $http.get('/1.json', { etag: '1' })
-      .error(onError);
-    $httpBackend.flush();
-
-    $http.get('/1.json', { etag: '2' })
-      .success(onSuccess);
-    $httpBackend.flush();
-
-    onSuccess.should.have.been.called();
-    onError.should.have.been.called();
-  });
-
-
-  it('should allow for usage of a user\'s own $cacheFactory cache', function () {
-    $http.get('/1.json', {
-        etag: { cache: { id:'test', key:1 } }
-      })
-      .success(onSuccess);
-    $httpBackend.flush();
-
-    userCache.get(1).$$etag.should.equal('1');
-
-    $http.get('/1.json', {
-        etag: { cache: { id:'test', key:1 } }
-      })
-      .error(onError);
-    $httpBackend.flush();
-
-    onSuccess.should.have.been.called();
-    onError.should.have.been.called();
-  });
-
-
-  it('should return user\'s $cacheFactory data on 304', function () {
-    var cachedData;
-
-    $http.get('/1.json', {
-        etag: { cache: { id:'test', key:1 } }
-      })
-      .success(onSuccess);
-    $httpBackend.flush();
-
-    userCache.get(1).$$etag.should.equal('1');
-
-    $http.get('/1.json', {
-        etag: { cache: { id:'test', key:1 } }
-      })
-      .error(function (data) {
-        cachedData = data;
-      });
-    $httpBackend.flush();
-
-    onSuccess.should.have.been.called();
-    cachedData.should.deep.equal({
-      $$etag: '1',
-      id: 1,
-      content: 'Test data'
-    });
-  });
-
-
-  it('should ignore an invalid $cacheFactory ID', function () {
-    $http.get('/1.json', {
-        etag: { cache: { id:'invalid', key:1 } }
-      })
-      .success(onSuccess);
-    $httpBackend.flush();
-
-    $http.get('/1.json', {
-        etag: { cache: { id:'invalid', key:1 } }
-      })
-      .success(onSuccess);
-    $httpBackend.flush();
-
-    onSuccess.should.have.been.called.twice;
   });
 
 
