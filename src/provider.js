@@ -4,10 +4,10 @@ var angular    = require('angular');
 module.exports = httpEtagProvider;
 
 function httpEtagProvider () {
-  var self           = this,
-      caches         = {},
-      cacheService   = '$cacheFactory',
-      defaultCacheId = 'httpEtagDefault';
+  var self             = this,
+      caches           = {},
+      cacheServiceName = '$cacheFactory',
+      defaultCacheId   = 'httpEtagDefault';
 
   // Default cache
   caches[defaultCacheId] = {
@@ -20,10 +20,10 @@ function httpEtagProvider () {
   };
 
 
-  self.$get = ['$cacheFactory', 'queryStringify', function ($cacheFactory, queryStringify) {
+  self.$get = [cacheServiceName, 'queryStringify', function (cacheService, queryStringify) {
 
     angular.forEach(caches, function httpEtagCacheBuilder (opts, id) {
-      $cacheFactory(id, opts);
+      cacheService(id, opts);
     });
 
     function httpEtagGetCacheKey (url, params) {
@@ -36,12 +36,12 @@ function httpEtagProvider () {
     // of different caching plugins allowing for web storage.
     function httpEtagGetCacheValue (id, key) {
       id = id === true ? defaultCacheId : id;
-      return $cacheFactory.get(id).get(key);
+      return cacheService.get(id).get(key);
     }
 
     function httpEtagPutCacheValue (id, key, value) {
       id = id === true ? defaultCacheId : id;
-      $cacheFactory.get(id).put(key, value);
+      cacheService.get(id).put(key, value);
     }
 
     return {
