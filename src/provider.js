@@ -20,27 +20,34 @@ function httpEtagProvider () {
   };
 
 
-  self.$get = ['$cacheFactory', function ($cacheFactory) {
+  self.$get = ['$cacheFactory', 'queryStringify', function ($cacheFactory, queryStringify) {
 
     angular.forEach(caches, function httpEtagCacheBuilder (opts, id) {
       $cacheFactory(id, opts);
     });
 
+    function httpEtagGetCacheKey (url, params) {
+      var queryString = queryStringify(params);
+      url += ((url.indexOf('?') == -1) ? '?' : '&') + queryString;
+      return url;
+    }
+
     // Abstract get/put operations for future support
     // of different caching plugins allowing for web storage.
     function httpEtagGetCacheValue (id, key) {
-      id = id || defaultCacheId;
+      id = id === true ? defaultCacheId : id;
       $cacheFactory.get(id).get(key);
     }
 
-    function httpEtagPutCacheValue (id, key) {
-      id = id || defaultCacheId;
-      $cacheFactory.get(id).put(key);
+    function httpEtagPutCacheValue (id, key, value) {
+      id = id === true ? defaultCacheId : id;
+      $cacheFactory.get(id).put(key, value);
     }
 
     return {
-      cacheGet: httpEtagGetCacheValue,
-      cachePut: httpEtagPutCacheValue
+      getCacheKey: httpEtagGetCacheKey,
+      cacheGet:    httpEtagGetCacheValue,
+      cachePut:    httpEtagPutCacheValue
     };
 
   }];
