@@ -7,7 +7,8 @@ function httpEtagProvider () {
   var self             = this,
       caches           = {},
       cacheServiceName = '$cacheFactory',
-      defaultCacheId   = 'httpEtagDefault';
+      cacheIdPrefix    = 'etag-',
+      defaultCacheId   = cacheIdPrefix + 'default';
 
   // Default cache
   caches[defaultCacheId] = {
@@ -15,7 +16,7 @@ function httpEtagProvider () {
   };
 
   self.cache = function httpEtagProviderCache (id, opts) {
-    caches[id] = opts || {};
+    caches[cacheIdPrefix + id] = opts || {};
     return self;
   };
 
@@ -35,12 +36,12 @@ function httpEtagProvider () {
     // Abstract get/put operations for future support
     // of different caching plugins allowing for web storage.
     function httpEtagGetCacheValue (id, key) {
-      id = id === true ? defaultCacheId : id;
+      id = id === true ? defaultCacheId : cacheIdPrefix + id;
       return cacheService.get(id).get(key);
     }
 
     function httpEtagPutCacheValue (id, key, value) {
-      id = id === true ? defaultCacheId : id;
+      id = id === true ? defaultCacheId : cacheIdPrefix + id;
       cacheService.get(id).put(key, value);
     }
 
