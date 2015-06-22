@@ -20,6 +20,7 @@ function httpEtagModuleRun (httpEtag, objectKeys) {
           cacheKey, cacheValue, etag, promise;
 
       if (isEtagReq) {
+        config.etagCacheKey =
         cacheKey   = httpEtag.getCacheKey(config.url, config.params);
         cacheValue = httpEtag.cacheGet(config.etag, cacheKey);
         etag       = cacheValue ? cacheValue.etag : undefined;
@@ -47,10 +48,11 @@ function httpEtagModuleRun (httpEtag, objectKeys) {
       config = config || {};
 
       var method    = this,
-          isEtagReq = config.etag && (method == 'GET' || method == 'JSONP'),
+          isEtagReq = config.etag && (method == 'get' || method == 'jsonp'),
           cacheKey, cacheValue, etag, promise;
 
       if (isEtagReq) {
+        config.etagCacheKey =
         cacheKey   = httpEtag.getCacheKey(url, config.params);
         cacheValue = httpEtag.cacheGet(config.etag, cacheKey);
         etag       = cacheValue ? cacheValue.etag : undefined;
