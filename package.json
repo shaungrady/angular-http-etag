@@ -29,7 +29,7 @@
     "url": "https://github.com/shaungrady/angular-http-etag/issues"
   },
   "dependencies": {
-    "browserify-shim": "^3.8.8",
+    "object-keys": "^1.0.4",
     "query-string": "^2.3.0"
   },
   "peerDependencies": {
