@@ -36,7 +36,7 @@ function httpEtagProvider () {
     // of different caching plugins allowing for web storage.
     function httpEtagGetCacheValue (id, key) {
       id = id === true ? defaultCacheId : id;
-      $cacheFactory.get(id).get(key);
+      return $cacheFactory.get(id).get(key);
     }
 
     function httpEtagPutCacheValue (id, key, value) {
