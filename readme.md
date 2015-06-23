@@ -47,7 +47,6 @@ simply define a cache with the ID of `default` and your desired options. Returns
 All cache IDs are prefixed with `etag-` to avoid collisions.
 
 ``` javascript
-
 angular
   .module('MyApp', ['http-etag'])
   .config(['httpEtagProvider', function (httpEtagProvider) {
@@ -57,8 +56,6 @@ angular
       .cache('infiniteCache');
 
   }]);
-
-
 ```
 
 ## API
@@ -81,7 +78,6 @@ will not be called.
 An example of basic usage utilizing the default cache (25-entry LRU `$cacheFactory` cache):
 
 ``` javascript
-
 var userData;
 
 $http.get('/users/77.json', {
@@ -108,5 +104,4 @@ $http.get('/users/77.json', {
     if (status != 304)
       alert('Request error');
   });
-
 ```
