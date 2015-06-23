@@ -51,10 +51,10 @@ describe('angular-http-etag', function () {
       .respond(304);
 
     $httpBackend
-      .whenGET('/1.json?param=test', ifEtagIsNot('1'))
+      .whenGET('/1.json?x=1&y=2&y=3', ifEtagIsNot('1'))
       .respond(serverData, { 'etag': '1' });
     $httpBackend
-      .whenGET('/1.json?param=test', ifEtagIs('1'))
+      .whenGET('/1.json?x=1&y=2&y=3', ifEtagIs('1'))
       .respond(304);
 
   }));
@@ -131,16 +131,20 @@ describe('angular-http-etag', function () {
 
 
   it('should cache ETags for requests with query params', function () {
-    $http.get('/1.json', { etag: true, params: { param: 'test' } })
+    $http.get('/1.json', { etag: true, params: { x:1, y:[2, 3] } })
       .success(onSuccess);
     $httpBackend.flush();
 
-    $http.get('/1.json', { etag: true, params: { param: 'test' } })
+    $http.get('/1.json', { etag: true, params: { x:1, y:[2, 3] } })
       .error(onError);
     $httpBackend.flush();
 
-    onSuccess.should.have.been.once;
-    onError.should.have.been.once;
+    $http.get('/1.json', { etag: true })
+      .success(onSuccess);
+    $httpBackend.flush();
+
+    onSuccess.should.have.been.called.twice;
+    onError.should.have.been.called.once;
   });
 
 
