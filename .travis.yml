@@ -2,4 +2,4 @@ language: node_js
 node_js:
 - '0.10'
 after_script:
-- codeclimate < ./coverage/lcov.info
+- codeclimate < coverage/lcov.info

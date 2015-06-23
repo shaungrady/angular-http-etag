@@ -41,6 +41,7 @@
     "browserify": "^10.2.4",
     "chai": "^3.0.0",
     "chai-spies": "^0.6.0",
+    "codeclimate-test-reporter": "0.0.4",
     "derequire": "^2.0.0",
     "exposify": "^0.4.3",
     "gulp": "^3.9.0",
