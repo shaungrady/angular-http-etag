@@ -104,7 +104,8 @@ describe('angular-http-etag', function () {
     $http.get('/1.json', { etag: 'test' })
       .cache(function (data) {
         userData = data;
-      });
+      })
+      .error(onError);
     $httpBackend.flush();
 
     $http.get('/1.json', { etag: true })
@@ -113,6 +114,7 @@ describe('angular-http-etag', function () {
 
     userData.should.deep.equal(serverData);
     onSuccess.should.have.been.called.once;
+    onError.should.have.been.called.once;
   });
 
 
