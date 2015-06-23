@@ -1,4 +1,9 @@
 # Angular HTTP ETag Module
+
+[![Build Status](https://travis-ci.org/shaungrady/angular-http-etag.svg?branch=master)](https://travis-ci.org/shaungrady/angular-http-etag)
+[![Test Coverage](https://codeclimate.com/github/shaungrady/angular-http-etag/badges/coverage.svg)](https://codeclimate.com/github/shaungrady/angular-http-etag/coverage)
+[![npm version](https://badge.fury.io/js/angular-http-etag.svg)](http://badge.fury.io/js/angular-http-etag)
+
 Adds easy ETag-based caching to the `$http` service. It...
 
 * Decorates the `$http` service to provide a synchronous `cache` method on the
