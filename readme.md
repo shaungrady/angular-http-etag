@@ -1,8 +1,18 @@
-# Angular HTTP ETag Interceptor
-Adds ETag support to the `$http` service.
+# Angular HTTP ETag Module
+Adds easy ETag-based caching to the `$http` service. It...
+
+* Decorates the `$http` service to provide a synchronous `cache` method on the
+returned promise.
+
+* Intercepts `$http` responses to cache response data and ETags.
+
+* Utilizes `$cacheFactory` for in-memory caching; ideal for single-page apps.
+
+* All leveraged by adding a single property to your `$http` config objects: `etag: true`.
 
 
 ## Installation
+
 `$ npm install angular-http-etag`
 
 
@@ -22,90 +32,74 @@ angular.module('myApp', [
 ]);
 ```
 
+## Provider
+#### `httpEtagProvider.cache(id, [options])`
+Instantiates a `$cacheFactory` cache with the given ID and options.
+The default cache is configured with `{ number: 25 }`. To override the default,
+simply define a cache with the ID of `default` and your desired options. Returns self.
 
-## A Word About ETags and Response Caching
-
-To start automatically caching response ETags and sending them in subsequent requests to the same URLs, simply add the `etag: true` property to your `$http config` object.
-
-This module assumes you will manage response data caching yourself. Additionally, ETag caching is done in-memory only. For Single Page Apps, that's all you need.
-
- When an ETag is sent and the server responds with a `304 - Not Modified`, no data is sent back from the server and the `$http` service considers the response to be an error. Consider:
+All cache IDs are prefixed with `etag-` to avoid collisions.
 
 ``` javascript
 
-var userData;
+angular
+  .module('MyApp', ['http-etag'])
+  .config(['httpEtagProvider', function (httpEtagProvider) {
 
-function fetchData () {
-  $http.get('/users/77.json', {
-      etag: true
-    })
-    .success(function (data) {
-      userData = data;
-    })
-    .error(function (data, status) {
-      if (status == 304)
-        console.log('Not modified.');
-    });
-}
+    httpEtagProvider
+      .cache('lruCache', { number: 5 })
+      .cache('infiniteCache');
 
-// The first request would behave as any other. When the server returns a response,
-// the `etag` header is automatically stored in memory within the service.
-fetchData();
+  }]);
 
-// The next time the request is made, the `If-None-Match` header is set to the
-// ETag returned by the most recent request to that URL.
-// In this call, if the data for user 77 hasn't changed on the server, the
-// response will be an error with a status of 304.
-fetchData();
 
 ```
 
 ## API
-To make use of this module, simply add an `etag` property to your `$http` request config.
 
+To enable caching/transmission of ETags as well as caching of response data, simply
+add the `etag` property to the configuration object passed to your `$http` calls.
 
-### Automatic ETag Caching/Sending
-Response ETags are cached and automatically sent in the `If-None-Match` header on subsequent requests.
-``` javascript
-$http.get('/', {
-  etag: true
-});
-```
+The value can either be `true`, in which case the default `httpEtag` cache will
+be used, or it can be the ID of a cache you've configured with `httpEtagProvider`.
 
-### Specify an ETag
-A shortcut to send a specific ETag to the server. Response ETag will be cached as before.
-``` javascript
-$http.get('/', {
-  etag: '123789456'
-});
-```
+For valid `$http` requests that have the `etag` property in their configuration,
+a new method will be attached to the returned promise: `cache(function)`. It's
+important to note that, unlike the other promise methods, `cache` is synchronous.
+If the request has previously been cached, the function passed to `cache` will
+be called with the previously cached data. If no cached data exists, the function
+will not be called.
 
-### Use Your Own $cacheFactory Cache
-If you'd like ETag and response data to be cached in your own $cacheFactory cache automatically. This is useful for sharing cached response data across controllers and in distinct caches. On 304 "errors", your cached data will be supplied in the `data` argument.
+---
+
+An example of basic usage utilizing the default cache (25-entry LRU `$cacheFactory` cache):
 
 ``` javascript
-// Our own LRU cache
-var cache = $cacheFactory('myCache', {
-  number: 10
-});
+
 var userData;
 
 $http.get('/users/77.json', {
-    etag: {
-      // $cacheFactory id and key to store response data under
-      cache: {
-        id:  'myCache',
-        key: 77
-      }
-    }
+    etag: true
   })
+
+  // Synchronous method, calls fn with cached data if cached data exists
+  .cache(function (data) {
+    userData = data;
+  })
+
+  // Successful request, ETag is cached and sent in subsequent requests, response
+  // data is cached and sent to functions passed to the {promise}.cache method
   .success(function (data) {
     userData = data;
   })
+
+  // If status == 304, data wasn't modified, and it generally shouldn't
+  // be treated as an error. Since data isn't sent from the server, the
+  // {promise}.cache method above ensures you have the freshest data cached
+  // from a previous request.
   .error(function (data, status) {
-    if (status == 304 && !userData) {
-      // data is provided from 'myCache' $cacheFactory.
-      userData = data;
-    }
-  })
+    if (status != 304)
+      alert('Request error');
+  });
+
 ```
