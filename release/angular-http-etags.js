@@ -192,9 +192,10 @@ function httpEtagProvider () {
       cacheService(id, opts);
     });
 
-    function stringifyParams (params) {
-      return params ? polyfills.map(polyfills.keys(params).sort, function (key) {
-        var val = params[key];
+    // Based on npm query-string
+    function stringifyParams (obj) {
+      return obj ? polyfills.map(polyfills.keys(obj).sort(), function (key) {
+        var val = obj[key];
 
         if (angular.isArray(val)) {
           return polyfills.map(val.sort(), function (val2) {
@@ -205,8 +206,6 @@ function httpEtagProvider () {
         return encodeURIComponent(key) + '=' + encodeURIComponent(val);
       }).join('&') : '';
     }
-
-    window.stringifyParams = stringifyParams;
 
     function httpEtagGetCacheKey (url, params) {
       var queryString = stringifyParams(params);
