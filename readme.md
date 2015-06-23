@@ -85,12 +85,13 @@ An example of basic usage utilizing the default cache (25-entry LRU `$cacheFacto
 var userData;
 
 $http.get('/users/77.json', {
-    etag: true
+    etag: true // Or 'lruCache', 'infiniteCache', etc.
   })
 
   // Synchronous method, calls fn with cached data if cached data exists
   .cache(function (data) {
-    userData = data;
+    if (!userData)
+      userData = data;
   })
 
   // Successful request, ETag is cached and sent in subsequent requests, response

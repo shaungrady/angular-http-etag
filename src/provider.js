@@ -21,14 +21,29 @@ function httpEtagProvider () {
   };
 
 
-  self.$get = [cacheServiceName, 'queryStringify', function (cacheService, queryStringify) {
+  self.$get = [cacheServiceName, 'polyfills', function (cacheService, polyfills) {
 
     angular.forEach(caches, function httpEtagCacheBuilder (opts, id) {
       cacheService(id, opts);
     });
 
+    // Based on npm query-string
+    function stringifyParams (obj) {
+      return obj ? polyfills.map(polyfills.keys(obj).sort(), function (key) {
+        var val = obj[key];
+
+        if (angular.isArray(val)) {
+          return polyfills.map(val.sort(), function (val2) {
+            return encodeURIComponent(key) + '=' + encodeURIComponent(val2);
+          }).join('&');
+        }
+
+        return encodeURIComponent(key) + '=' + encodeURIComponent(val);
+      }).join('&') : '';
+    }
+
     function httpEtagGetCacheKey (url, params) {
-      var queryString = queryStringify(params);
+      var queryString = stringifyParams(params);
       url += ((url.indexOf('?') == -1) ? '?' : '&') + queryString;
       return url;
     }

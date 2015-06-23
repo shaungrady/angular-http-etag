@@ -1,4 +1,17 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.angularHttpEtags = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
+module.exports = function (xs, f) {
+    if (xs.map) return xs.map(f);
+    var res = [];
+    for (var i = 0; i < xs.length; i++) {
+        var x = xs[i];
+        if (hasOwn.call(xs, i)) res.push(f(x, i, xs));
+    }
+    return res;
+};
+
+var hasOwn = Object.prototype.hasOwnProperty;
+
+},{}],2:[function(_dereq_,module,exports){
 'use strict';
 
 // modified from https://github.com/es-shims/es5-shim
@@ -85,7 +98,7 @@ keysShim.shim = function shimObjectKeys() {
 
 module.exports = keysShim;
 
-},{"./isArguments":2}],2:[function(_dereq_,module,exports){
+},{"./isArguments":3}],3:[function(_dereq_,module,exports){
 'use strict';
 
 var toStr = Object.prototype.toString;
@@ -102,60 +115,6 @@ module.exports = function isArguments(value) {
 			toStr.call(value.callee) === '[object Function]';
 	}
 	return isArgs;
-};
-
-},{}],3:[function(_dereq_,module,exports){
-'use strict';
-
-exports.extract = function (maybeUrl) {
-	return maybeUrl.split('?')[1] || '';
-};
-
-exports.parse = function (str) {
-	if (typeof str !== 'string') {
-		return {};
-	}
-
-	str = str.trim().replace(/^(\?|#|&)/, '');
-
-	if (!str) {
-		return {};
-	}
-
-	return str.split('&').reduce(function (ret, param) {
-		var parts = param.replace(/\+/g, ' ').split('=');
-		var key = parts[0];
-		var val = parts[1];
-
-		key = decodeURIComponent(key);
-		// missing `=` should be `null`:
-		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
-		val = val === undefined ? null : decodeURIComponent(val);
-
-		if (!ret.hasOwnProperty(key)) {
-			ret[key] = val;
-		} else if (Array.isArray(ret[key])) {
-			ret[key].push(val);
-		} else {
-			ret[key] = [ret[key], val];
-		}
-
-		return ret;
-	}, {});
-};
-
-exports.stringify = function (obj) {
-	return obj ? Object.keys(obj).sort().map(function (key) {
-		var val = obj[key];
-
-		if (Array.isArray(val)) {
-			return val.sort().map(function (val2) {
-				return encodeURIComponent(key) + '=' + encodeURIComponent(val2);
-			}).join('&');
-		}
-
-		return encodeURIComponent(key) + '=' + encodeURIComponent(val);
-	}).join('&') : '';
 };
 
 },{}],4:[function(_dereq_,module,exports){
@@ -227,14 +186,30 @@ function httpEtagProvider () {
   };
 
 
-  self.$get = [cacheServiceName, 'queryStringify', function (cacheService, queryStringify) {
+  self.$get = [cacheServiceName, 'polyfills', function (cacheService, polyfills) {
 
     angular.forEach(caches, function httpEtagCacheBuilder (opts, id) {
       cacheService(id, opts);
     });
 
+    function stringifyParams (params) {
+      return params ? polyfills.map(polyfills.keys(params).sort, function (key) {
+        var val = params[key];
+
+        if (angular.isArray(val)) {
+          return polyfills.map(val.sort(), function (val2) {
+            return encodeURIComponent(key) + '=' + encodeURIComponent(val2);
+          }).join('&');
+        }
+
+        return encodeURIComponent(key) + '=' + encodeURIComponent(val);
+      }).join('&') : '';
+    }
+
+    window.stringifyParams = stringifyParams;
+
     function httpEtagGetCacheKey (url, params) {
-      var queryString = queryStringify(params);
+      var queryString = stringifyParams(params);
       url += ((url.indexOf('?') == -1) ? '?' : '&') + queryString;
       return url;
     }
@@ -268,9 +243,9 @@ function httpEtagProvider () {
 var angular    = (typeof window !== "undefined" ? window.angular : typeof global !== "undefined" ? global.angular : null);
 module.exports = httpEtagModuleRun;
 
-httpEtagModuleRun.$inject = ['httpEtag', 'objectKeys'];
+httpEtagModuleRun.$inject = ['httpEtag', 'polyfills'];
 
-function httpEtagModuleRun (httpEtag, objectKeys) {
+function httpEtagModuleRun (httpEtag, polyfills) {
   var $provide = angular.module('http-etag')._$provide;
   delete angular.module('http-etag')._$provide;
 
@@ -342,7 +317,7 @@ function httpEtagModuleRun (httpEtag, objectKeys) {
 
 
     // Wrap all the shortcut methods
-    angular.forEach(objectKeys($http), function (key) {
+    angular.forEach(polyfills.keys($http), function (key) {
       if (angular.isFunction($http[key]))
         http[key] = angular.bind(key, httpMethod);
     });
@@ -359,7 +334,7 @@ function httpEtagModuleRun (httpEtag, objectKeys) {
 
 var angular     = (typeof window !== "undefined" ? window.angular : typeof global !== "undefined" ? global.angular : null);
 var objectKeys  = _dereq_('object-keys');
-var queryString = _dereq_('query-string');
+var arrayMap    = _dereq_('array-map');
 
 var provider    = _dereq_('./provider');
 var interceptor = _dereq_('./interceptor');
@@ -368,10 +343,10 @@ var run         = _dereq_('./run');
 
 module.exports = angular
   .module('http-etag', [])
-  
-  .value('objectKeys', objectKeys)
-  .value('queryStringify', queryString.stringify)
-
+  .value('polyfills', {
+    keys: objectKeys,
+    map: arrayMap
+  })
   .provider('httpEtag', provider)
   .factory('httpEtagInterceptor', interceptor)
   .config(config)
@@ -380,5 +355,5 @@ module.exports = angular
   .name;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./config":4,"./interceptor":5,"./provider":6,"./run":7,"object-keys":1,"query-string":3}]},{},[8])(8)
+},{"./config":4,"./interceptor":5,"./provider":6,"./run":7,"array-map":1,"object-keys":2}]},{},[8])(8)
 });

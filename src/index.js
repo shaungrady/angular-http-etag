@@ -2,7 +2,7 @@
 
 var angular     = require('angular');
 var objectKeys  = require('object-keys');
-var queryString = require('query-string');
+var arrayMap    = require('array-map');
 
 var provider    = require('./provider');
 var interceptor = require('./interceptor');
@@ -11,10 +11,10 @@ var run         = require('./run');
 
 module.exports = angular
   .module('http-etag', [])
-  
-  .value('objectKeys', objectKeys)
-  .value('queryStringify', queryString.stringify)
-
+  .value('polyfills', {
+    keys: objectKeys,
+    map: arrayMap
+  })
   .provider('httpEtag', provider)
   .factory('httpEtagInterceptor', interceptor)
   .config(config)

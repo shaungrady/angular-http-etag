@@ -3,9 +3,9 @@
 var angular    = require('angular');
 module.exports = httpEtagModuleRun;
 
-httpEtagModuleRun.$inject = ['httpEtag', 'objectKeys'];
+httpEtagModuleRun.$inject = ['httpEtag', 'polyfills'];
 
-function httpEtagModuleRun (httpEtag, objectKeys) {
+function httpEtagModuleRun (httpEtag, polyfills) {
   var $provide = angular.module('http-etag')._$provide;
   delete angular.module('http-etag')._$provide;
 
@@ -77,7 +77,7 @@ function httpEtagModuleRun (httpEtag, objectKeys) {
 
 
     // Wrap all the shortcut methods
-    angular.forEach(objectKeys($http), function (key) {
+    angular.forEach(polyfills.keys($http), function (key) {
       if (angular.isFunction($http[key]))
         http[key] = angular.bind(key, httpMethod);
     });
