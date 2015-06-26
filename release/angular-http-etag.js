@@ -1,4 +1,4 @@
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.angularHttpEtags = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.angularHttpEtag = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 module.exports = function (xs, f) {
     if (xs.map) return xs.map(f);
     var res = [];
@@ -169,6 +169,7 @@ var angular    = (typeof window !== "undefined" ? window.angular : typeof global
 module.exports = httpEtagProvider;
 
 function httpEtagProvider () {
+  /*jshint validthis: true */
   var self             = this,
       caches           = {},
       cacheServiceName = '$cacheFactory',
@@ -186,7 +187,8 @@ function httpEtagProvider () {
   };
 
 
-  self.$get = [cacheServiceName, 'polyfills', function (cacheService, polyfills) {
+  self.$get = ['polyfills', '$injector', function (polyfills, $injector) {
+    var cacheService = $injector.get(cacheServiceName);
 
     angular.forEach(caches, function httpEtagCacheBuilder (opts, id) {
       cacheService(id, opts);
@@ -248,7 +250,7 @@ function httpEtagModuleRun (httpEtag, polyfills) {
   var $provide = angular.module('http-etag')._$provide;
   delete angular.module('http-etag')._$provide;
 
-  $provide.decorator('$http', function ($delegate) {
+  $provide.decorator('$http', ['$delegate', function ($delegate) {
     var $http = $delegate,
         http, httpMethod;
 
@@ -322,7 +324,7 @@ function httpEtagModuleRun (httpEtag, polyfills) {
     });
 
     return http;
-  });
+  }]);
 
 }
 
