@@ -9,7 +9,7 @@ function httpEtagModuleRun (httpEtag, polyfills) {
   var $provide = angular.module('http-etag')._$provide;
   delete angular.module('http-etag')._$provide;
 
-  $provide.decorator('$http', function ($delegate) {
+  $provide.decorator('$http', ['$delegate', function ($delegate) {
     var $http = $delegate,
         http, httpMethod;
 
@@ -83,6 +83,6 @@ function httpEtagModuleRun (httpEtag, polyfills) {
     });
 
     return http;
-  });
+  }]);
 
 }

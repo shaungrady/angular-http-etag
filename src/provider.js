@@ -4,6 +4,7 @@ var angular    = require('angular');
 module.exports = httpEtagProvider;
 
 function httpEtagProvider () {
+  /*jshint validthis: true */
   var self             = this,
       caches           = {},
       cacheServiceName = '$cacheFactory',
@@ -21,7 +22,8 @@ function httpEtagProvider () {
   };
 
 
-  self.$get = [cacheServiceName, 'polyfills', function (cacheService, polyfills) {
+  self.$get = ['polyfills', '$injector', function (polyfills, $injector) {
+    var cacheService = $injector.get(cacheServiceName);
 
     angular.forEach(caches, function httpEtagCacheBuilder (opts, id) {
       cacheService(id, opts);
