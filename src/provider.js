@@ -9,10 +9,10 @@ function httpEtagProvider () {
       caches           = {},
       cacheServiceName = '$cacheFactory',
       cacheIdPrefix    = 'etag-',
-      defaultCacheId   = cacheIdPrefix + 'default';
+      defaultCacheId   = 'default';
 
   // Default cache
-  caches[defaultCacheId] = {
+  caches[cacheIdPrefix + defaultCacheId] = {
     number: 25
   };
 
@@ -25,9 +25,61 @@ function httpEtagProvider () {
   self.$get = ['polyfills', '$injector', function (polyfills, $injector) {
     var cacheService = $injector.get(cacheServiceName);
 
+    // Instantiate caches defined in provider
     angular.forEach(caches, function httpEtagCacheBuilder (opts, id) {
       cacheService(id, opts);
     });
+
+    function httpEtagParseCacheKey (cacheId, url, params) {
+      cacheId = getFullCacheId(cacheId);
+
+      var keyParser = cacheService.get(cacheId).info().keyParser,
+          key, queryString;
+
+      if (angular.isFunction(keyParser))
+        key = keyParser(url, params);
+
+      // Failsafe
+      if (angular.isUndefined(key)) {
+        queryString = stringifyParams(params);
+        key = url + ((url.indexOf('?') == -1) ? '?' : '&') + queryString;
+      }
+
+      return key;
+    }
+
+    // Abstract get/put operations for future support of different caching
+    // plugins allowing for web storage
+    function httpEtagGetCacheValue (id, key) {
+      if (arguments.length == 1) {
+          key = id;
+          id  = true;
+      }
+
+      id = getFullCacheId(id);
+      return cacheService.get(id).get(key);
+    }
+
+    function httpEtagPutCacheValue (id, key, value) {
+      if (arguments.length == 2) {
+          value = key;
+          key   = id;
+          id    = true;
+      }
+
+      id = getFullCacheId(id);
+      cacheService.get(id).put(key, value);
+    }
+
+    return {
+      _parseCacheKey: httpEtagParseCacheKey,
+      cacheGet: httpEtagGetCacheValue,
+      cachePut: httpEtagPutCacheValue
+    };
+
+
+    // Helpers
+    //////////
 
     // Based on npm query-string
     function stringifyParams (obj) {
@@ -44,29 +96,9 @@ function httpEtagProvider () {
       }).join('&') : '';
     }
 
-    function httpEtagGetCacheKey (url, params) {
-      var queryString = stringifyParams(params);
-      url += ((url.indexOf('?') == -1) ? '?' : '&') + queryString;
-      return url;
+    function getFullCacheId (id) {
+      return cacheIdPrefix + (id === true ? defaultCacheId : id);
     }
-
-    // Abstract get/put operations for future support
-    // of different caching plugins allowing for web storage.
-    function httpEtagGetCacheValue (id, key) {
-      id = id === true ? defaultCacheId : cacheIdPrefix + id;
-      return cacheService.get(id).get(key);
-    }
-
-    function httpEtagPutCacheValue (id, key, value) {
-      id = id === true ? defaultCacheId : cacheIdPrefix + id;
-      cacheService.get(id).put(key, value);
-    }
-
-    return {
-      getCacheKey: httpEtagGetCacheKey,
-      cacheGet:    httpEtagGetCacheValue,
-      cachePut:    httpEtagPutCacheValue
-    };
 
   }];
 }
