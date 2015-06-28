@@ -13,11 +13,18 @@ require('angular-mocks/ngMock');
 
 
 describe('angular-http-etag', function () {
-  var $http, $httpBackend, $cacheFactory, testModule, serverData,
+  var $http, $httpBackend, $cacheFactory, httpEtag, testModule, serverData,
       ifEtagIs, ifEtagIsNot, onCache, onSuccess, onError;
 
   testModule = angular.module('test', ['http-etag']).config(['httpEtagProvider', function (httpEtagProvider) {
-    httpEtagProvider.cache('test');
+    httpEtagProvider
+      .cache('test')
+      .cache('keyParserTest', {
+        keyParser: function (url, params) {
+          var match = url.match(/\/(\d+).json/i);
+          return (match || [])[1];
+        }
+      });
   }]);
 
   beforeEach(angular.mock.module(require('../')));
@@ -28,6 +35,7 @@ describe('angular-http-etag', function () {
     $http         = $injector.get('$http');
     $httpBackend  = $injector.get('$httpBackend');
     $cacheFactory = $injector.get('$cacheFactory');
+    httpEtag      = $injector.get('httpEtag');
 
     onCache   = spy('$http().cache',   angular.noop);
     onSuccess = spy('$http().success', angular.noop);
@@ -48,6 +56,13 @@ describe('angular-http-etag', function () {
       .respond(serverData, { 'etag': '1' });
     $httpBackend
       .whenGET('/1.json', ifEtagIs('1'))
+      .respond(304);
+
+    $httpBackend
+      .whenGET('/1', ifEtagIsNot('1'))
+      .respond(serverData, { 'etag': '1' });
+    $httpBackend
+      .whenGET('/1', ifEtagIs('1'))
       .respond(304);
 
     $httpBackend
@@ -145,6 +160,37 @@ describe('angular-http-etag', function () {
 
     onSuccess.should.have.been.called.twice;
     onError.should.have.been.called.once;
+  });
+
+
+  it('should cache data under a specific key when a keyParser is defined', function () {
+    $http.get('/1.json', { etag: 'keyParserTest' })
+      .success(onSuccess);
+    $httpBackend.flush();
+
+    $http.get('/1.json', { etag: 'keyParserTest' })
+      .error(onError);
+    $httpBackend.flush();
+
+    httpEtag.cacheGet('keyParserTest', '1').should.exist;
+  });
+
+  it('should fail safely if keyParser returns undefined', function () {
+    $http.get('/1', { etag: 'keyParserTest' })
+      .success(onSuccess);
+    $httpBackend.flush();
+
+    $http.get('/1', { etag: 'keyParserTest' })
+      .error(onError);
+    $httpBackend.flush();
+
+    httpEtag.cacheGet('keyParserTest', '/1?').should.exist;
+  });
+
+
+  it('service should put/get to/from default cache when no id is specified', function () {
+    httpEtag.cachePut('hi', 'how are you');
+    httpEtag.cacheGet('hi').should.equal('how are you');
   });
 
 
