@@ -38,13 +38,18 @@ angular.module('myApp', [
 ]);
 ```
 
-## Provider
-#### `httpEtagProvider.cache(id, [options])`
+## `httpEtagProvider` Methods
+### `cache(id, [options])`
 Instantiates a `$cacheFactory` cache with the given ID and options.
-The default cache is configured with `{ number: 25 }`. To override the default,
-simply define a cache with the ID of `default` and your desired options. Returns self.
+The default cache is configured with `{ number: 25 }` under the ID of `default`.
 
-All cache IDs are prefixed with `etag-` to avoid collisions.
+#### Options Object
+| Key | Value | Details |
+|-----|-------|---------|
+| number | `number` |  Optional. If defined, cache becomes a least-recently used (LRU) cache. |
+| keyParser | `function(url,param)` | Optional. If defined, ETag requests using this `cacheId` will have their data cached under the key returned by the `keyParser` function. This allows for predictable cache keys and, by extension, easy use of optimistic caching with the `httpEtag` service.
+
+
 
 ``` javascript
 angular
@@ -53,12 +58,46 @@ angular
 
     httpEtagProvider
       .cache('lruCache', { number: 5 })
-      .cache('infiniteCache');
+      .cache('predictablyKeyedCache', {
+        keyParser(url, params) {
+          if (params.id)
+            return params.id;
+          return (url.match(/\/(\d+).json/i) || [])[1];
+        }
+      });
 
   }]);
 ```
 
-## API
+
+## `httpEtag` Service Methods
+
+#### `cacheGet([id], key)`
+Gets the data cached under specified ID and key. If no ID is specified, `default` is used.
+
+#### `cachePut([id], key, value)`
+Puts the value into the specified cache ID under the specified key. If no ID is specified, `default` is used.
+
+
+``` javascript
+angular
+  .controler('MyCtrl', ['httpEtag', function (httpEtag) {
+
+    // Precache data
+    this.createUser = function createUser (userData) {
+      $http.post('/users.json', userData)
+        .success(function (data) {
+          // Assume server returns new user id under data.id
+          httpEtag.cachePut('predictablyKeyedCache', data.id, userData);
+        })
+    }
+
+  }]);
+```
+
+
+
+## `$http` option API
 
 To enable caching/transmission of ETags as well as caching of response data, simply
 add the `etag` property to the configuration object passed to your `$http` calls.
@@ -81,7 +120,7 @@ An example of basic usage utilizing the default cache (25-entry LRU `$cacheFacto
 var userData;
 
 $http.get('/users/77.json', {
-    etag: true // Or 'lruCache', 'infiniteCache', etc.
+    etag: true // Or 'lruCache', 'predictablyKeyedCache', etc.
   })
 
   // Synchronous method, calls fn with cached data if cached data exists
