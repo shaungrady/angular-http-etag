@@ -3,13 +3,13 @@
 var angular    = require('angular');
 module.exports = httpEtagModuleRun;
 
-httpEtagModuleRun.$inject = ['httpEtag', 'polyfills'];
-
-function httpEtagModuleRun (httpEtag, polyfills) {
+function httpEtagModuleRun () {
   var $provide = angular.module('http-etag')._$provide;
   delete angular.module('http-etag')._$provide;
 
-  $provide.decorator('$http', ['$delegate', function ($delegate) {
+  $provide.decorator('$http', ['$delegate', 'httpEtag', 'polyfills',
+       function ($delegate, httpEtag, polyfills) {
+
     var $http = $delegate,
         http, httpMethod;
 
@@ -21,7 +21,7 @@ function httpEtagModuleRun (httpEtag, polyfills) {
 
       if (isEtagReq) {
         config.etagCacheKey =
-        cacheKey   = httpEtag.getCacheKey(config.url, config.params);
+        cacheKey   = httpEtag._parseCacheKey(config.etag, config.url, config.params);
         cacheValue = httpEtag.cacheGet(config.etag, cacheKey);
         etag       = cacheValue ? cacheValue.etag : undefined;
 
@@ -36,7 +36,7 @@ function httpEtagModuleRun (httpEtag, polyfills) {
       if (isEtagReq)
         promise.cache = function (fn) {
           if (cacheValue)
-            fn(cacheValue.data, cacheKey);
+            fn(cacheValue.data);
           return promise;
         };
 
@@ -52,8 +52,9 @@ function httpEtagModuleRun (httpEtag, polyfills) {
           cacheKey, cacheValue, etag, promise;
 
       if (isEtagReq) {
+
         config.etagCacheKey =
-        cacheKey   = httpEtag.getCacheKey(url, config.params);
+        cacheKey   = httpEtag._parseCacheKey(config.etag, url, config.params);
         cacheValue = httpEtag.cacheGet(config.etag, cacheKey);
         etag       = cacheValue ? cacheValue.etag : undefined;
 
@@ -68,7 +69,7 @@ function httpEtagModuleRun (httpEtag, polyfills) {
       if (isEtagReq)
         promise.cache = function (fn) {
           if (cacheValue)
-            fn(cacheValue.data, cacheKey);
+            fn(cacheValue.data);
           return promise;
         };
 
