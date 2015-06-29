@@ -59,7 +59,7 @@ angular
     httpEtagProvider
       .cache('lruCache', { number: 5 })
       .cache('predictablyKeyedCache', {
-        keyParser(url, params) {
+        keyParser: function (url, params) {
           if (params.id)
             return params.id;
           return (url.match(/\/(\d+).json/i) || [])[1];
