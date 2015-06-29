@@ -5,42 +5,56 @@ module.exports = httpEtagProvider;
 
 function httpEtagProvider () {
   /*jshint validthis: true */
-  var self             = this,
-      caches           = {},
-      cacheServiceName = '$cacheFactory',
-      cacheIdPrefix    = 'etag-',
-      defaultCacheId   = 'default';
-
-  // Default cache
-  caches[cacheIdPrefix + defaultCacheId] = {
-    number: 25
-  };
+  var self                = this,
+      caches              = {},
+      defaultCacheService = '$cacheFactory',
+      cacheIdPrefix       = 'etag-',
+      defaultCacheId      = 'default';
 
   self.cache = function httpEtagProviderCache (id, opts) {
-    caches[cacheIdPrefix + id] = opts || {};
+    caches[cacheIdPrefix + id] =
+      angular.extend({}, opts, { cacheService: defaultCacheService });
     return self;
   };
 
+  // Default cache
+  self.cache('default', { number: 25 });
+
 
   self.$get = ['polyfills', '$injector', function (polyfills, $injector) {
-    var cacheService = $injector.get(cacheServiceName);
+    var cacheServices = {};
 
     // Instantiate caches defined in provider
     angular.forEach(caches, function httpEtagCacheBuilder (opts, id) {
-      cacheService(id, opts);
+      var cacheServiceName = opts.cacheService,
+          cacheService     = cacheServices[cacheServiceName];
+
+      if (!cacheService)
+        cacheServices[cacheServiceName] =
+        cacheService = $injector.get(cacheServiceName);
+
+      switch (cacheServiceName) {
+        // ngStorage
+        case '$localStorage':
+        case '$sessionStorage':
+          break;
+        // $cacheFactory, angular-cache
+        default:
+          cacheService(id, opts);
+      }
     });
 
     function httpEtagParseCacheKey (cacheId, url, params) {
       cacheId = getFullCacheId(cacheId);
 
-      var keyParser = cacheService.get(cacheId).info().keyParser,
+      var keyParser = caches[cacheId].keyParser,
           key, queryString;
 
       if (angular.isFunction(keyParser))
         key = keyParser(url, params);
 
       // Failsafe
-      if (angular.isUndefined(key)) {
+      if (!angular.isString(key) && !angular.isNumber(key)) {
         queryString = stringifyParams(params);
         key = url + ((url.indexOf('?') == -1) ? '?' : '&') + queryString;
       }
@@ -48,27 +62,52 @@ function httpEtagProvider () {
       return key;
     }
 
-    // Abstract get/put operations for future support of different caching
-    // plugins allowing for web storage
+    // Get
     function httpEtagGetCacheValue (id, key) {
       if (arguments.length == 1) {
-          key = id;
-          id  = true;
+        key = id;
+        id  = true;
       }
 
       id = getFullCacheId(id);
-      return cacheService.get(id).get(key);
+
+      var cacheServiceName = caches[id].cacheService,
+          cacheService     = cacheServices[cacheServiceName];
+
+      switch (cacheServiceName) {
+        // ngStorage
+        case '$localStorage':
+        case '$sessionStorage':
+          return cacheService[id +'-'+ key];
+        // $cacheFactory, angular-cache
+        default:
+          return cacheService.get(id).get(key);
+      }
     }
 
+    // Put
     function httpEtagPutCacheValue (id, key, value) {
       if (arguments.length == 2) {
-          value = key;
-          key   = id;
-          id    = true;
+        value = key;
+        key   = id;
+        id    = true;
       }
 
       id = getFullCacheId(id);
-      cacheService.get(id).put(key, value);
+
+      var cacheServiceName = caches[id].cacheService,
+          cacheService     = cacheServices[cacheServiceName];
+
+      switch (cacheServiceName) {
+        // ngStorage
+        case '$localStorage':
+        case '$sessionStorage':
+          cacheService[id +'-'+ key] = value;
+          break;
+        // $cacheFactory, angular-cache
+        default:
+          cacheService.get(id).put(key, value);
+      }
     }
 
     return {
