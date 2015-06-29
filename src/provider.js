@@ -12,22 +12,27 @@ function httpEtagProvider () {
       defaultCacheId      = 'default';
 
   self.cache = function httpEtagProviderCache (id, opts) {
-    caches[cacheIdPrefix + id] =
-      angular.extend({}, opts, { cacheService: defaultCacheService });
+    caches[cacheIdPrefix + id] = angular.isObject(opts) ? opts : {};
+    return self;
+  };
+
+  self.setDefaultCacheService = function httpEtagProviderSetDefaultCacheService (serviceName) {
+    if (angular.isString(serviceName))
+      defaultCacheService = serviceName;
     return self;
   };
 
   // Default cache
   self.cache('default', { number: 25 });
 
-
   self.$get = ['polyfills', '$injector', function (polyfills, $injector) {
     var cacheServices = {};
 
     // Instantiate caches defined in provider
     angular.forEach(caches, function httpEtagCacheBuilder (opts, id) {
-      var cacheServiceName = opts.cacheService,
-          cacheService     = cacheServices[cacheServiceName];
+      var config = caches[id] = angular.extend({ cacheService: defaultCacheService }, opts),
+          cacheServiceName    = config.cacheService,
+          cacheService        = cacheServices[cacheServiceName];
 
       if (!cacheService)
         cacheServices[cacheServiceName] =
@@ -40,7 +45,7 @@ function httpEtagProvider () {
           break;
         // $cacheFactory, angular-cache
         default:
-          cacheService(id, opts);
+          cacheService(id, config);
       }
     });
 
