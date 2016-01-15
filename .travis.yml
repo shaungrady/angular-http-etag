@@ -1,5 +1,5 @@
 language: node_js
 node_js:
-- '0.10'
+- '5'
 after_script:
 - codeclimate < coverage/lcov.info
