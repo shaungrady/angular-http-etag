@@ -1,19 +1,40 @@
 # Angular HTTP ETag Module
 
+[![npm version](https://badge.fury.io/js/angular-http-etag.svg)](http://badge.fury.io/js/angular-http-etag)
 [![Build Status](https://travis-ci.org/shaungrady/angular-http-etag.svg?branch=master)](https://travis-ci.org/shaungrady/angular-http-etag)
 [![Test Coverage](https://codeclimate.com/github/shaungrady/angular-http-etag/badges/coverage.svg)](https://codeclimate.com/github/shaungrady/angular-http-etag/coverage)
-[![Code Climate](https://codeclimate.com/github/shaungrady/angular-http-etag/badges/gpa.svg)](https://codeclimate.com/github/shaungrady/angular-http-etag)
-[![npm version](https://badge.fury.io/js/angular-http-etag.svg)](http://badge.fury.io/js/angular-http-etag)
+[![Code Climate](https://codeclimate.com/github/shaungrady/angular-http-etag/badges/gpa.svg)](https://codeclimate.com/github/shaungrady/angular-http-etag)  
+[![Dependency Status](https://david-dm.org/shaungrady/angular-http-etag.svg)](https://david-dm.org/shaungrady/angular-http-etag)
+[![devDependency Status](https://david-dm.org/shaungrady/angular-http-etag/dev-status.svg)](https://david-dm.org/shaungrady/angular-http-etag#info=devDependencies)
+
+``` javascript
+var userData
+
+$http
+  .get('/users/77.json', {
+    etag: true
+  })
+  // Synchronous, gets called whenever data
+  // for this request already exists in the cache.
+  .cache(function (cachedData) {
+    if (!userData) userData = cachedData
+  })
+  .success(function (data) {
+    userData = data
+  })
+  .error(function (data, status) {
+    // 304: 'Not Modified', etags matched
+    if (status != 304) alert('Request error')
+  })
+```
+
 
 Adds easy ETag-based caching to the `$http` service. It...
 
 * Decorates the `$http` service to provide a synchronous `cache` method on the
 returned promise.
-
 * Intercepts `$http` responses to cache response data and ETags.
-
 * Utilizes `$cacheFactory` for in-memory caching; ideal for single-page apps.
-
 * All leveraged by adding a single property to your `$http` config objects: `etag: true`.
 
 
@@ -47,7 +68,7 @@ The default cache is configured with `{ number: 25 }` under the ID of `default`.
 | Key | Value | Details |
 |-----|-------|---------|
 | number | `number` |  Optional. If defined, cache becomes a least-recently used (LRU) cache. |
-| keyParser | `function(url,param)` | Optional. If defined, ETag requests using this `cacheId` will have their data cached under the key returned by the `keyParser` function. This allows for predictable cache keys and, by extension, easy use of optimistic caching with the `httpEtag` service.
+| keyParser | `function(url, param)` | Optional. If defined, ETag requests using this `cacheId` will have their data cached under the key returned by the `keyParser` function. This allows for predictable cache keys and, by extension, easy use of optimistic caching with the `httpEtag` service.
 
 
 
