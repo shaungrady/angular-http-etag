@@ -38,6 +38,7 @@
   },
   "devDependencies": {
     "angular": "~1.4.0",
+    "angular-cache": "^4.2.0",
     "angular-mocks": "~1.4.0",
     "browserify": "^10.2.4",
     "chai": "^3.0.0",
@@ -48,6 +49,7 @@
     "gulp": "^3.9.0",
     "mochify": "^2.9.0",
     "mochify-istanbul": "^2.3.0",
+    "ngstorage": "^0.3.6",
     "phantom": "^0.7.2"
   },
   "ignore": [
