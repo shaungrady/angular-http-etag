@@ -39,16 +39,16 @@
   "devDependencies": {
     "angular": "~1.4.0",
     "angular-mocks": "~1.4.0",
-    "browserify": "^10.2.4",
+    "browserify": "^13.0.0",
     "chai": "^3.0.0",
-    "chai-spies": "^0.6.0",
-    "codeclimate-test-reporter": "0.0.4",
+    "chai-spies": "^0.7.1",
+    "codeclimate-test-reporter": "0.2.0",
     "derequire": "^2.0.0",
-    "exposify": "^0.4.3",
+    "exposify": "^0.5.0",
     "gulp": "^3.9.0",
     "mochify": "^2.9.0",
     "mochify-istanbul": "^2.3.0",
-    "phantom": "^0.7.2"
+    "phantom": "^0.8.4"
   },
   "ignore": [
     "**/.*",
