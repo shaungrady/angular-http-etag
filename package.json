@@ -42,7 +42,7 @@
     "browserify": "^13.0.0",
     "chai": "^3.0.0",
     "chai-spies": "^0.7.1",
-    "codeclimate-test-reporter": "^0.2.0",
+    "codeclimate-test-reporter": "^0.3.0",
     "derequire": "^2.0.0",
     "exposify": "^0.5.0",
     "mochify": "^2.9.0",
