@@ -19,7 +19,7 @@ var has = Object.prototype.hasOwnProperty;
 var toStr = Object.prototype.toString;
 var slice = Array.prototype.slice;
 var isArgs = _dereq_('./isArguments');
-var hasDontEnumBug = !({ 'toString': null }).propertyIsEnumerable('toString');
+var hasDontEnumBug = !({ toString: null }).propertyIsEnumerable('toString');
 var hasProtoEnumBug = function () {}.propertyIsEnumerable('prototype');
 var dontEnums = [
 	'toString',
@@ -30,6 +30,50 @@ var dontEnums = [
 	'propertyIsEnumerable',
 	'constructor'
 ];
+var equalsConstructorPrototype = function (o) {
+	var ctor = o.constructor;
+	return ctor && ctor.prototype === o;
+};
+var blacklistedKeys = {
+	$console: true,
+	$frame: true,
+	$frameElement: true,
+	$frames: true,
+	$parent: true,
+	$self: true,
+	$webkitIndexedDB: true,
+	$webkitStorageInfo: true,
+	$window: true
+};
+var hasAutomationEqualityBug = (function () {
+	/* global window */
+	if (typeof window === 'undefined') { return false; }
+	for (var k in window) {
+		try {
+			if (!blacklistedKeys['$' + k] && has.call(window, k) && window[k] !== null && typeof window[k] === 'object') {
+				try {
+					equalsConstructorPrototype(window[k]);
+				} catch (e) {
+					return true;
+				}
+			}
+		} catch (e) {
+			return true;
+		}
+	}
+	return false;
+}());
+var equalsConstructorPrototypeIfNotBuggy = function (o) {
+	/* global window */
+	if (typeof window === 'undefined' || !hasAutomationEqualityBug) {
+		return equalsConstructorPrototype(o);
+	}
+	try {
+		return equalsConstructorPrototype(o);
+	} catch (e) {
+		return false;
+	}
+};
 
 var keysShim = function keys(object) {
 	var isObject = object !== null && typeof object === 'object';
@@ -62,8 +106,7 @@ var keysShim = function keys(object) {
 	}
 
 	if (hasDontEnumBug) {
-		var ctor = object.constructor;
-		var skipConstructor = ctor && ctor.prototype === object;
+		var skipConstructor = equalsConstructorPrototypeIfNotBuggy(object);
 
 		for (var k = 0; k < dontEnums.length; ++k) {
 			if (!(skipConstructor && dontEnums[k] === 'constructor') && has.call(object, dontEnums[k])) {
@@ -75,9 +118,7 @@ var keysShim = function keys(object) {
 };
 
 keysShim.shim = function shimObjectKeys() {
-	if (!Object.keys) {
-		Object.keys = keysShim;
-	} else {
+	if (Object.keys) {
 		var keysWorksWithArguments = (function () {
 			// Safari 5.0 bug
 			return (Object.keys(arguments) || '').length === 2;
@@ -92,6 +133,8 @@ keysShim.shim = function shimObjectKeys() {
 				}
 			};
 		}
+	} else {
+		Object.keys = keysShim;
 	}
 	return Object.keys || keysShim;
 };
@@ -121,7 +164,7 @@ module.exports = function isArguments(value) {
 (function (global){
 'use strict';
 
-var angular    = (typeof window !== "undefined" ? window.angular : typeof global !== "undefined" ? global.angular : null);
+var angular    = (typeof window !== "undefined" ? window['angular'] : typeof global !== "undefined" ? global['angular'] : null);
 module.exports = httpEtagModuleConfig;
 
 httpEtagModuleConfig.$inject = ['$provide', '$httpProvider'];
@@ -137,7 +180,7 @@ function httpEtagModuleConfig ($provide, $httpProvider) {
 (function (global){
 'use strict';
 
-var angular = (typeof window !== "undefined" ? window.angular : typeof global !== "undefined" ? global.angular : null);
+var angular = (typeof window !== "undefined" ? window['angular'] : typeof global !== "undefined" ? global['angular'] : null);
 module.exports = httpEtagInterceptorFactory;
 
 httpEtagInterceptorFactory.$inject = ['httpEtag'];
@@ -165,7 +208,7 @@ function httpEtagInterceptorFactory (httpEtag) {
 (function (global){
 'use strict';
 
-var angular    = (typeof window !== "undefined" ? window.angular : typeof global !== "undefined" ? global.angular : null);
+var angular    = (typeof window !== "undefined" ? window['angular'] : typeof global !== "undefined" ? global['angular'] : null);
 module.exports = httpEtagProvider;
 
 function httpEtagProvider () {
@@ -273,7 +316,7 @@ function httpEtagProvider () {
 (function (global){
 'use strict';
 
-var angular    = (typeof window !== "undefined" ? window.angular : typeof global !== "undefined" ? global.angular : null);
+var angular    = (typeof window !== "undefined" ? window['angular'] : typeof global !== "undefined" ? global['angular'] : null);
 module.exports = httpEtagModuleRun;
 
 function httpEtagModuleRun () {
@@ -366,7 +409,7 @@ function httpEtagModuleRun () {
 (function (global){
 'use strict';
 
-var angular     = (typeof window !== "undefined" ? window.angular : typeof global !== "undefined" ? global.angular : null);
+var angular     = (typeof window !== "undefined" ? window['angular'] : typeof global !== "undefined" ? global['angular'] : null);
 var objectKeys  = _dereq_('object-keys');
 var arrayMap    = _dereq_('array-map');
 
