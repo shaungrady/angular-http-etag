@@ -25,20 +25,19 @@ function httpEtagModuleRun () {
         cacheValue = httpEtag.cacheGet(config.etag, cacheKey);
         etag       = cacheValue ? cacheValue.etag : undefined;
 
-        if (etag)
+        if (etag) {
           config.headers = angular.extend({}, config.headers, {
             'If-None-Match': etag
           });
+        }
       }
 
       promise = $http.apply($http, arguments);
 
-      if (isEtagReq)
-        promise.cache = function (fn) {
-          if (cacheValue)
-            fn(cacheValue.data);
-          return promise;
-        };
+      promise.cache = function (fn) {
+        if (isEtagReq && cacheValue) fn(cacheValue.data, undefined, undefined, config, true);
+        return promise;
+      };
 
       return promise;
     };
@@ -66,12 +65,10 @@ function httpEtagModuleRun () {
 
       promise = $http[method].apply($http, arguments);
 
-      if (isEtagReq)
-        promise.cache = function (fn) {
-          if (cacheValue)
-            fn(cacheValue.data);
-          return promise;
-        };
+      promise.cache = function (fn) {
+        if (isEtagReq && cacheValue) fn(cacheValue.data, undefined, undefined, config, true);
+        return promise;
+      };
 
       return promise;
     };

@@ -110,6 +110,34 @@ describe('angular-http-etag', function () {
   });
 
 
+  it('should return config and isCache arguments for cache method', function () {
+    var argData
+    var argStatus
+    var argHeaders
+    var argConfig
+    var argIsCache
+
+    $http({ method:'GET', url: '/1.json', etag: true })
+    $httpBackend.flush();
+
+    $http({ method:'GET', url: '/1.json', etag: true })
+      .cache(function (data, status, headers, config, isCache) {
+        argData = data
+        argStatus = status
+        argHeaders = headers
+        argConfig = config
+        argIsCache = isCache
+      });
+    $httpBackend.flush();
+
+    should.exist(argData)
+    should.not.exist(argStatus)
+    should.not.exist(argHeaders)
+    argConfig.should.be.an('object')
+    argIsCache.should.equal(true)
+  });
+
+
   it('should cache data on specified cache ID', function () {
     var userData;
 
