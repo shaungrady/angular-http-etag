@@ -19,8 +19,9 @@ var has = Object.prototype.hasOwnProperty;
 var toStr = Object.prototype.toString;
 var slice = Array.prototype.slice;
 var isArgs = _dereq_('./isArguments');
-var hasDontEnumBug = !({ toString: null }).propertyIsEnumerable('toString');
-var hasProtoEnumBug = function () {}.propertyIsEnumerable('prototype');
+var isEnumerable = Object.prototype.propertyIsEnumerable;
+var hasDontEnumBug = !isEnumerable.call({ toString: null }, 'toString');
+var hasProtoEnumBug = isEnumerable.call(function () {}, 'prototype');
 var dontEnums = [
 	'toString',
 	'toLocaleString',
@@ -34,12 +35,23 @@ var equalsConstructorPrototype = function (o) {
 	var ctor = o.constructor;
 	return ctor && ctor.prototype === o;
 };
-var blacklistedKeys = {
+var excludedKeys = {
 	$console: true,
+	$external: true,
 	$frame: true,
 	$frameElement: true,
 	$frames: true,
+	$innerHeight: true,
+	$innerWidth: true,
+	$outerHeight: true,
+	$outerWidth: true,
+	$pageXOffset: true,
+	$pageYOffset: true,
 	$parent: true,
+	$scrollLeft: true,
+	$scrollTop: true,
+	$scrollX: true,
+	$scrollY: true,
 	$self: true,
 	$webkitIndexedDB: true,
 	$webkitStorageInfo: true,
@@ -50,7 +62,7 @@ var hasAutomationEqualityBug = (function () {
 	if (typeof window === 'undefined') { return false; }
 	for (var k in window) {
 		try {
-			if (!blacklistedKeys['$' + k] && has.call(window, k) && window[k] !== null && typeof window[k] === 'object') {
+			if (!excludedKeys['$' + k] && has.call(window, k) && window[k] !== null && typeof window[k] === 'object') {
 				try {
 					equalsConstructorPrototype(window[k]);
 				} catch (e) {
@@ -341,20 +353,19 @@ function httpEtagModuleRun () {
         cacheValue = httpEtag.cacheGet(config.etag, cacheKey);
         etag       = cacheValue ? cacheValue.etag : undefined;
 
-        if (etag)
+        if (etag) {
           config.headers = angular.extend({}, config.headers, {
             'If-None-Match': etag
           });
+        }
       }
 
       promise = $http.apply($http, arguments);
 
-      if (isEtagReq)
-        promise.cache = function (fn) {
-          if (cacheValue)
-            fn(cacheValue.data);
-          return promise;
-        };
+      promise.cache = function (fn) {
+        if (isEtagReq && cacheValue) fn(cacheValue.data, undefined, undefined, config, true);
+        return promise;
+      };
 
       return promise;
     };
@@ -382,12 +393,10 @@ function httpEtagModuleRun () {
 
       promise = $http[method].apply($http, arguments);
 
-      if (isEtagReq)
-        promise.cache = function (fn) {
-          if (cacheValue)
-            fn(cacheValue.data);
-          return promise;
-        };
+      promise.cache = function (fn) {
+        if (isEtagReq && cacheValue) fn(cacheValue.data, undefined, undefined, config, true);
+        return promise;
+      };
 
       return promise;
     };
