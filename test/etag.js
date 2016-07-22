@@ -1,225 +1,124 @@
-'use strict';
+'use strict'
 
-/*global describe, beforeEach, it*/
+/* eslint-env mocha */
 
-var chai  = require('chai');
-var spies = require('chai-spies');
-chai.use(spies);
-var should = chai.should();
-var spy    = chai.spy;
+var chai = require('chai')
+var spies = require('chai-spies')
+chai.use(spies)
+var should = chai.should()
+var spy = chai.spy
 
-var angular = require('angular');
-require('angular-mocks/ngMock');
-
+var angular = require('angular')
+require('angular-mocks/ngMock')
 
 describe('angular-http-etag', function () {
+  /* eslint-disable no-unused-vars */
   var $http, $httpBackend, $cacheFactory, httpEtag, testModule, serverData,
-      ifEtagIs, ifEtagIsNot, onCache, onSuccess, onError;
+    ifEtagIs, ifEtagIsNot, onCached, onSuccess, onError
+  /* eslint-enable no-unused-vars */
 
   testModule = angular.module('test', ['http-etag']).config(['httpEtagProvider', function (httpEtagProvider) {
     httpEtagProvider
-      .cache('test')
-      .cache('keyParserTest', {
-        keyParser: function (url, params) {
-          var match = url.match(/\/(\d+).json/i);
-          return (match || [])[1];
-        }
-      });
-  }]);
+      .defineCache('$cacheFactoryTest', {
+        cacheService: '$cacheFactory'
+      })
+      .defineCache('localStorageTest', {
+        cacheService: 'localStorage'
+      })
+      .defineCache('sessionStorageTest', {
+        cacheService: 'sessionStorage'
+      })
+  }])
 
-  beforeEach(angular.mock.module(require('../')));
-  beforeEach(angular.mock.module('test'));
-
+  beforeEach(angular.mock.module(require('../')))
+  beforeEach(angular.mock.module('test'))
 
   beforeEach(angular.mock.inject(function ($injector) {
-    $http         = $injector.get('$http');
-    $httpBackend  = $injector.get('$httpBackend');
-    $cacheFactory = $injector.get('$cacheFactory');
-    httpEtag      = $injector.get('httpEtag');
+    $http = $injector.get('$http')
+    $httpBackend = $injector.get('$httpBackend')
+    $cacheFactory = $injector.get('$cacheFactory')
+    httpEtag = $injector.get('httpEtag')
 
-    onCache   = spy('$http().cache',   angular.noop);
-    onSuccess = spy('$http().success', angular.noop);
-    onError   = spy('$http().error',   angular.noop);
+    onCached = spy('$http().cached', angular.noop)
+    onSuccess = spy('$http().success', angular.noop)
+    onError = spy('$http().error', angular.noop)
 
     ifEtagIs = function (etag) {
-      return function (headers) { return headers['If-None-Match'] === etag; };
-    };
+      return function (headers) { return headers['If-None-Match'] === etag }
+    }
 
     ifEtagIsNot = function (etag) {
-      return function (headers) { return headers['If-None-Match'] !== etag; };
-    };
+      return function (headers) { return headers['If-None-Match'] !== etag }
+    }
 
-    serverData = { id:1, content:'Test data' };
+    serverData = { id: 1, content: 'Test data' }
 
     $httpBackend
       .whenGET('/1.json', ifEtagIsNot('1'))
-      .respond(serverData, { 'etag': '1' });
+      .respond(serverData, { 'etag': '1' })
     $httpBackend
       .whenGET('/1.json', ifEtagIs('1'))
-      .respond(304);
+      .respond(304)
 
     $httpBackend
       .whenGET('/1', ifEtagIsNot('1'))
-      .respond(serverData, { 'etag': '1' });
+      .respond(serverData, { 'etag': '1' })
     $httpBackend
       .whenGET('/1', ifEtagIs('1'))
-      .respond(304);
+      .respond(304)
 
     $httpBackend
       .whenGET('/1.json?x=1&y=2&y=3', ifEtagIsNot('1'))
-      .respond(serverData, { 'etag': '1' });
+      .respond(serverData, { 'etag': '1' })
     $httpBackend
       .whenGET('/1.json?x=1&y=2&y=3', ifEtagIs('1'))
-      .respond(304);
+      .respond(304)
+  }))
 
-  }));
+  it('Adapters should work', function () {
+    var testValue = [{ hi: true, mom: [{ 1: '😍' }] }]
 
+    var cachesIds = [
+      '$cacheFactoryTest',
+      'localStorageTest',
+      'sessionStorageTest'
+    ]
 
-  it('should cache ETags', function () {
+    cachesIds.forEach(function (cacheId) {
+      var cache = httpEtag.getCache(cacheId)
+
+      cache.setItem('test', testValue)
+      cache.getItem('test').should.deep.equal(testValue)
+      cache.removeItem('test')
+      should.not.exist(cache.getItem('test'))
+      cache.setItem('test1', testValue)
+      cache.setItem('test2', testValue)
+      cache.removeAllItems()
+      should.not.exist(cache.getItem('test1'))
+      should.not.exist(cache.getItem('test2'))
+
+      var itemCache = cache.getItemCache('test')
+
+      itemCache.set(testValue)
+      itemCache.get('test').should.deep.equal(testValue)
+      itemCache.remove('test')
+      should.not.exist(itemCache.get('test'))
+    })
+  })
+
+  it('Decorator/Interceptor should work', function () {
     $http.get('/1.json', { etag: true })
-      .cache(onCache)
-      .success(onSuccess);
-    $httpBackend.flush();
-
-    $http.get('/1.json', { etag: true })
-      .cache(onCache)
-      .error(onError);
-    $httpBackend.flush();
-
-    onCache.should.have.been.called.once;
-    onSuccess.should.have.been.called.once;
-    onError.should.have.been.called.once;
-  });
-
-
-  it('should cache data', function () {
-    var userData;
-
-    $http({ method:'GET', url: '/1.json', etag: true })
-      .cache(onCache);
-    $httpBackend.flush();
-
-    $http({ method:'GET', url: '/1.json', etag: true })
-      .cache(function (data) {
-        userData = data;
-      });
-    $httpBackend.flush();
-
-    onCache.should.not.have.been.called();
-    userData.should.deep.equal(serverData);
-  });
-
-
-  it('should return config and isCache arguments for cache method', function () {
-    var argData
-    var argStatus
-    var argHeaders
-    var argConfig
-    var argIsCache
-
-    $http({ method:'GET', url: '/1.json', etag: true })
-    $httpBackend.flush();
-
-    $http({ method:'GET', url: '/1.json', etag: true })
-      .cache(function (data, status, headers, config, isCache) {
-        argData = data
-        argStatus = status
-        argHeaders = headers
-        argConfig = config
-        argIsCache = isCache
-      });
-    $httpBackend.flush();
-
-    should.exist(argData)
-    should.not.exist(argStatus)
-    should.not.exist(argHeaders)
-    argConfig.should.be.an('object')
-    argIsCache.should.equal(true)
-  });
-
-
-  it('should cache data on specified cache ID', function () {
-    var userData;
-
-    $http.get('/1.json', { etag: 'test' });
-    $httpBackend.flush();
-
-    $http.get('/1.json', { etag: 'test' })
-      .cache(function (data) {
-        userData = data;
-      })
-      .error(onError);
-    $httpBackend.flush();
+      .cached(onCached)
+      .success(onSuccess)
+    $httpBackend.flush()
 
     $http.get('/1.json', { etag: true })
-      .success(onSuccess);
-    $httpBackend.flush();
+      .cached(onCached)
+      .error(onError)
+    $httpBackend.flush()
 
-    userData.should.deep.equal(serverData);
-    onSuccess.should.have.been.called.once;
-    onError.should.have.been.called.once;
-  });
-
-
-  it('should function normally without ETag config property', function () {
-    $http.get('/1.json').success(onSuccess);
-    $httpBackend.flush();
-
-    $http({ method: 'GET', url: '/1.json'}).error(onError);
-    $httpBackend.flush();
-
-    onSuccess.should.have.been.called.once;
-    onError.should.not.have.been.called.once;
-  });
-
-
-  it('should cache ETags for requests with query params', function () {
-    $http.get('/1.json', { etag: true, params: { x:1, y:[2, 3] } })
-      .success(onSuccess);
-    $httpBackend.flush();
-
-    $http.get('/1.json', { etag: true, params: { x:1, y:[2, 3] } })
-      .error(onError);
-    $httpBackend.flush();
-
-    $http.get('/1.json', { etag: true })
-      .success(onSuccess);
-    $httpBackend.flush();
-
-    onSuccess.should.have.been.called.twice;
-    onError.should.have.been.called.once;
-  });
-
-
-  it('should cache data under a specific key when a keyParser is defined', function () {
-    $http.get('/1.json', { etag: 'keyParserTest' })
-      .success(onSuccess);
-    $httpBackend.flush();
-
-    $http.get('/1.json', { etag: 'keyParserTest' })
-      .error(onError);
-    $httpBackend.flush();
-
-    httpEtag.cacheGet('keyParserTest', '1').should.exist;
-  });
-
-  it('should fail safely if keyParser returns undefined', function () {
-    $http.get('/1', { etag: 'keyParserTest' })
-      .success(onSuccess);
-    $httpBackend.flush();
-
-    $http.get('/1', { etag: 'keyParserTest' })
-      .error(onError);
-    $httpBackend.flush();
-
-    httpEtag.cacheGet('keyParserTest', '/1?').should.exist;
-  });
-
-
-  it('service should put/get to/from default cache when no id is specified', function () {
-    httpEtag.cachePut('hi', 'how are you');
-    httpEtag.cacheGet('hi').should.equal('how are you');
-  });
-
-
-});
+    onCached.should.have.been.called.once
+    onSuccess.should.have.been.called.once
+    onError.should.have.been.called.once
+  })
+})
