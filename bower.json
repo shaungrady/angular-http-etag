@@ -27,7 +27,7 @@
     "node_modules",
     "bower_components",
     "test",
-    "tests"
+    "coverage"
   ],
   "dependencies": {
     "angular": ">=1.2 <1.6"

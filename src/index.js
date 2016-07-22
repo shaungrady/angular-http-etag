@@ -10,9 +10,6 @@ var service = require('./service')
 var $httpDecorator = require('./httpDecorator')
 var $httpInterceptor = require('./httpInterceptor')
 
-// var config = require('./config')
-// var run = require('./run')
-
 module.exports = angular
   .module('http-etag', [])
   .value('polyfills', {

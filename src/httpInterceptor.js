@@ -1,6 +1,5 @@
 'use strict'
 
-// var angular = require('angular')
 module.exports = httpEtagInterceptorFactory
 
 function httpEtagInterceptorFactory () {
