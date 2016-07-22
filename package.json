@@ -11,7 +11,7 @@
     "start": "mochify --watch",
     "phantom": "mochify",
     "coverage": "mochify --plugin [ mochify-istanbul --report lcov --dir './coverage' ]",
-    "test": "npm run phantom && npm run coverage"
+    "test": "npm run phantom && npm run coverage && eslint ./"
   },
   "repository": {
     "type": "git",
