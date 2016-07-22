@@ -9,6 +9,7 @@ var _$provide
 var service = require('./service')
 var $httpDecorator = require('./httpDecorator')
 var $httpInterceptor = require('./httpInterceptor')
+var cacheServiceAdapters = require('./cacheServiceAdapters')
 
 module.exports = angular
   .module('http-etag', [])
@@ -17,6 +18,7 @@ module.exports = angular
     map: arrayMap
   })
   .provider('httpEtag', service)
+  .config(cacheServiceAdapters)
   .config(['$provide', '$httpProvider', function ($provide, $httpProvider) {
     _$provide = $provide
     $httpProvider.interceptors.push($httpInterceptor)
