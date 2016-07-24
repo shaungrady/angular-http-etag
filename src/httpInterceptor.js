@@ -5,16 +5,19 @@ module.exports = httpEtagInterceptorFactory
 function httpEtagInterceptorFactory () {
   function responseInterceptor (response) {
     var itemCache = response.config.$$_itemCache
-    var etag = response.headers().etag
 
     if (itemCache) {
-      // Don't assume server sent etag header
+      var cacheInfo = itemCache.info()
+      var cacheResponseData = cacheInfo.cacheResponseData
+      var etag = response.headers().etag
+      var cacheData = {}
+
       if (etag) {
-        itemCache.set({
-          responseData: response.data,
-          etagHeader: etag
-        })
+        cacheData.etagHeader = etag
+        if (cacheResponseData) cacheData.responseData = response.data
+        itemCache.set(cacheData)
       }
+
       delete response.config.$$_itemCache
     }
 

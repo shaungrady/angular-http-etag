@@ -1,8 +1,6 @@
 'use strict'
 
 var angular = require('angular')
-var objectKeys = require('object-keys')
-var arrayMap = require('array-map')
 
 var _$provide
 
@@ -13,10 +11,6 @@ var cacheServiceAdapters = require('./cacheServiceAdapters')
 
 module.exports = angular
   .module('http-etag', [])
-  .value('polyfills', {
-    keys: objectKeys,
-    map: arrayMap
-  })
   .provider('httpEtag', service)
   .config(cacheServiceAdapters)
   .config(['$provide', '$httpProvider', function ($provide, $httpProvider) {

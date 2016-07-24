@@ -1,11 +1,14 @@
 'use strict'
 
 var angular = require('angular')
+var objectKeys = require('object-keys')
+var arrayMap = require('array-map')
+
 module.exports = httpEtagHttpDecorator
 
-httpEtagHttpDecorator.$inject = ['$delegate', 'httpEtag', 'polyfills']
+httpEtagHttpDecorator.$inject = ['$delegate', 'httpEtag']
 
-function httpEtagHttpDecorator ($delegate, httpEtag, polyfills) {
+function httpEtagHttpDecorator ($delegate, httpEtag) {
   var $http = $delegate
   var cachableHttpMethods = [
     'GET',
@@ -21,8 +24,64 @@ function httpEtagHttpDecorator ($delegate, httpEtag, polyfills) {
     'patch'
   ]
 
+  function $httpDecorator (httpConfig) {
+    var isCachable = httpConfig.etagCache && cachableHttpMethods.indexOf(httpConfig.method) >= 0
+    var httpPromise
+
+    if (isCachable) {
+      var etagCacheConfig = processHttpConfigEtagValue(httpConfig)
+      var itemCache = httpEtag.getItemCache(etagCacheConfig.id, etagCacheConfig.itemKey)
+      var cacheInfo = itemCache.info()
+      var cachedData = itemCache.get()
+      var cachedEtag = cachedData && cachedData.etagHeader
+      var cachedResponse = cachedEtag && cachedData.responseData
+
+      // Allow easy access to cache in interceptor
+      httpConfig.$$_itemCache = itemCache
+
+      if (cachedEtag) {
+        httpConfig.headers = angular.extend({}, httpConfig.headers, {
+          'If-None-Match': cachedEtag
+        })
+      }
+    }
+
+    httpPromise = $http.apply($http, arguments)
+
+    httpPromise.cached = function (callback) {
+      if (isCachable && cachedData && cacheInfo.cacheResponseData) callback(cachedResponse, undefined, undefined, httpConfig, itemCache)
+      return httpPromise
+    }
+
+    return httpPromise
+  }
+
+  // Decorate the shortcut methods, too
+  angular.forEach($httpShortcutMethods, function (method) {
+    var httpMethod = method.toUpperCase()
+    var isCachable = cachableHttpMethods.indexOf(httpMethod) >= 0
+    var shortcutMethod
+
+    if (!isCachable) shortcutMethod = $http[method]
+    else {
+      shortcutMethod = function httpEtagHttpShortcutWrapper (url, config) {
+        config = angular.extend({}, config, {
+          method: httpMethod,
+          url: url
+        })
+
+        return $httpDecorator.call($http, config)
+      }
+    }
+    $httpDecorator[method] = shortcutMethod
+  })
+
+  /**
+   * HELPERS
+   */
+
   function processHttpConfigEtagValue (httpConfig) {
-    var etagValue = httpConfig.etag
+    var etagValue = httpConfig.etagCache
     var etagValueType = typeof etagValue
     var etagCacheConfig = {}
 
@@ -39,61 +98,6 @@ function httpEtagHttpDecorator ($delegate, httpEtag, polyfills) {
     return etagCacheConfig
   }
 
-  function httpDecorator (httpConfig) {
-    var isCachable = httpConfig.etag && cachableHttpMethods.indexOf(httpConfig.method) >= 0
-    var etagCacheConfig, itemCache, cachedData, cachedResponse, cachedEtag, httpPromise
-
-    if (isCachable) {
-      etagCacheConfig = processHttpConfigEtagValue(httpConfig)
-      itemCache = httpEtag.getItemCache(etagCacheConfig.id, etagCacheConfig.itemKey)
-      cachedData = itemCache.get()
-      cachedEtag = cachedData && cachedData.etagHeader
-      cachedResponse = cachedEtag && cachedData.data
-
-      // Allow easy access to cache in interceptor
-      httpConfig.$$_itemCache = itemCache
-
-      if (cachedEtag) {
-        httpConfig.headers = angular.extend({}, httpConfig.headers, {
-          'If-None-Match': cachedEtag
-        })
-      }
-    }
-
-    httpPromise = $http.apply($http, arguments)
-
-    httpPromise.cached = function (callback) {
-      if (isCachable && cachedData) callback(cachedResponse, undefined, undefined, httpConfig, itemCache)
-      return httpPromise
-    }
-
-    return httpPromise
-  }
-
-  // Wrap shortcut methods
-  angular.forEach($httpShortcutMethods, function (method) {
-    var httpMethod = method.toUpperCase()
-    var isCachable = cachableHttpMethods.indexOf(httpMethod) >= 0
-    var shortcutMethod
-
-    if (!isCachable) shortcutMethod = $http[method]
-    else {
-      shortcutMethod = function httpEtagHttpShortcutWrapper (url, config) {
-        config = angular.extend({}, config, {
-          method: httpMethod,
-          url: url
-        })
-
-        return httpDecorator.call($http, config)
-      }
-    }
-    httpDecorator[method] = shortcutMethod
-  })
-
-  /**
-   * HELPERS
-   */
-
   function generateCacheItemKey (httpConfig) {
     var url = httpConfig.url
     var params = stringifyParams(httpConfig.params)
@@ -102,11 +106,11 @@ function httpEtagHttpDecorator ($delegate, httpEtag, polyfills) {
 
   // Based on npm package "query-string"
   function stringifyParams (obj) {
-    return obj ? polyfills.map(polyfills.keys(obj).sort(), function (key) {
+    return obj ? arrayMap(objectKeys(obj).sort(), function (key) {
       var val = obj[key]
 
       if (angular.isArray(val)) {
-        return polyfills.map(val.sort(), function (val2) {
+        return arrayMap(val.sort(), function (val2) {
           return encodeURIComponent(key) + '=' + encodeURIComponent(val2)
         }).join('&')
       }
@@ -115,5 +119,5 @@ function httpEtagHttpDecorator ($delegate, httpEtag, polyfills) {
     }).join('&') : ''
   }
 
-  return httpDecorator
+  return $httpDecorator
 }

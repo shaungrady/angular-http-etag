@@ -1,6 +1,8 @@
 'use strict'
 
 var angular = require('angular')
+var deepcopy = require('deepcopy')
+
 module.exports = httpEtagProvider
 
 function httpEtagProvider () {
@@ -19,6 +21,8 @@ function httpEtagProvider () {
     // info method hard-coded
   ]
 
+  var requiredAdapterMethods = serviceAdapterMethods.concat(cacheAdapterMethods)
+
   var itemCacheMethods = [
     'set',
     'get',
@@ -33,6 +37,7 @@ function httpEtagProvider () {
   // Cache config defaults
   var defaultCacheId = 'httpEtagCache'
   var defaultEtagCacheOptions = {
+    cacheResponseData: true,
     deepCopy: false,
     cacheService: '$cacheFactory',
     cacheOptions: {
@@ -53,6 +58,10 @@ function httpEtagProvider () {
     return httpEtagProvider
   }
 
+  httpEtagProvider.getDefaultCacheOptions = function httpEtagGetDefaultCacheOptions () {
+    return defaultEtagCacheOptions
+  }
+
   httpEtagProvider.defineCache = function httpEtagDefineCache (cacheId, options) {
     var config = angular.extend({}, defaultEtagCacheOptions, options, { id: cacheId })
     cacheDefinitions[cacheId] = config
@@ -60,7 +69,14 @@ function httpEtagProvider () {
   }
 
   httpEtagProvider.defineCacheServiceAdapter = function httpEtagDefineCacheServiceAdapter (serviceName, config) {
-    // TODO: Require all required methods be defined
+    if (!config) throw new Error('Missing cache service adapter configuration')
+    if (!config.methods) throw new Error('Missing cache service adapter configuration methods')
+    angular.forEach(requiredAdapterMethods, function (method) {
+      if (typeof config.methods[method] !== 'function') {
+        throw new Error('Expected cache service adapter method "' + method + '" to be a function')
+      }
+    })
+
     cacheAdapters[serviceName] = config
     return httpEtagProvider
   }
@@ -76,7 +92,7 @@ function httpEtagProvider () {
    * .getItemCache(cacheId, itemKey)
    */
 
-  httpEtagProvider.$get = ['polyfills', '$injector', function (polyfills, $injector) {
+  httpEtagProvider.$get = ['$injector', function ($injector) {
     var httpEtagService = {}
 
     var services = {}
@@ -84,27 +100,43 @@ function httpEtagProvider () {
     var caches = {}
     var adaptedCaches = {}
 
+    // Add default cache if not already defined
+    if (!cacheDefinitions[defaultCacheId]) httpEtagProvider.defineCache(defaultCacheId)
+
     // Find/inject cache service and create adapted versions
-    angular.forEach(cacheAdapters, function (adapterMethods, serviceName) {
+    angular.forEach(cacheAdapters, function (adapter, serviceName) {
       var service = services[serviceName] = window[serviceName] || $injector.get(serviceName)
       var adaptedService = adaptedServices[serviceName] = {}
 
       angular.forEach(serviceAdapterMethods, function (method) {
-        adaptedService[method] = angular.bind({}, adapterMethods[method], service)
+        adaptedService[method] = angular.bind({}, adapter.methods[method], service)
       })
     })
-
-    // Add default cache if not already defined
-    if (!cacheDefinitions[defaultCacheId]) httpEtagProvider.defineCache(defaultCacheId)
 
     // Instantiate caches and create adapted versions
     angular.forEach(cacheDefinitions, function (config, cacheId) {
       adaptedServices[config.cacheService].createCache(cacheId, config)
       var cache = caches[cacheId] = adaptedServices[config.cacheService].getCache(cacheId)
       var adaptedCache = adaptedCaches[cacheId] = {}
+      // Determine whether to perform deepcopying or not
+      var serviceDeepCopies = cacheAdapters[config.cacheService].config.storesDeepCopies
+      var deepCopy = !serviceDeepCopies && cacheDefinitions[cacheId].deepCopy
 
       angular.forEach(cacheAdapterMethods, function (method) {
-        adaptedCache[method] = angular.bind({}, cacheAdapters[config.cacheService][method], cache)
+        var methodFn = cacheAdapters[config.cacheService].methods[method]
+        var deepCopyWrapperFn
+
+        if (deepCopy && method === 'setItem') {
+          deepCopyWrapperFn = function setItemDeepCopyWrapper (cache, itemKey, value, options) {
+            methodFn(cache, itemKey, deepcopy(value), options)
+          }
+        } else if (deepCopy && method === 'getItem') {
+          deepCopyWrapperFn = function setItemDeepCopyWrapper (cache, itemKey, options) {
+            return deepcopy(methodFn(cache, itemKey, options))
+          }
+        }
+
+        adaptedCache[method] = angular.bind({}, (deepCopyWrapperFn || methodFn), cache)
       })
 
       adaptedCache.getItemCache = function adaptedCacheGetItemCache (itemKey) {
@@ -120,12 +152,15 @@ function httpEtagProvider () {
     }
 
     httpEtagService.getCache = function httpEtagServiceGetCache (cacheId) {
-      return adaptedCaches[processCacheId(cacheId)]
+      var cache = adaptedCaches[processCacheId(cacheId)]
+      if (cache) return cache
     }
 
     httpEtagService.getItemCache = function httpEtagServiceGeItemCache (cacheId, itemKey) {
       var cache = httpEtagService.getCache(cacheId)
       var itemCache = {}
+
+      if (!cache) return
 
       angular.forEach(cacheAdapterMethods, function (method, i) {
         var itemCacheMethod = itemCacheMethods[i]
