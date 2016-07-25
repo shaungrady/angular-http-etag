@@ -87,7 +87,9 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
     var etagValueType = typeof etagValue
     var etagCacheConfig = {}
 
-    if (etagValueType === 'object') {
+    if (etagValueType === 'function') {
+      etagCacheConfig = etagValue(httpConfig)
+    } else if (etagValueType === 'object') {
       etagCacheConfig.id = etagValue.id
       etagCacheConfig.itemKey = etagValue.itemKey || generateCacheItemKey(httpConfig)
     } else if (etagValueType === 'string') {
