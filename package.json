@@ -8,9 +8,9 @@
   "main": "./src",
   "scripts": {
     "umd": "browserify -e . -s angularHttpEtag -t [exposify --expose [ --angular=angular ] ] -p derequire/plugin > ./release/angular-http-etag.js",
-    "start": "mochify --watch",
-    "phantom": "mochify",
-    "coverage": "mochify --plugin [ mochify-istanbul --report lcov --dir './coverage' ]",
+    "start": "mochify --watch test/",
+    "phantom": "mochify -R spec test/",
+    "coverage": "mochify --plugin [ mochify-istanbul --report lcov --dir './coverage' ] test/",
     "test": "npm run phantom && npm run coverage && eslint ./"
   },
   "repository": {
