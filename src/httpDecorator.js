@@ -30,19 +30,21 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
 
     if (isCachable) {
       var etagCacheConfig = processHttpConfigEtagValue(httpConfig)
-      var itemCache = httpEtag.getItemCache(etagCacheConfig.id, etagCacheConfig.itemKey)
-      var cacheInfo = itemCache.info()
-      var cachedData = itemCache.get()
-      var cachedEtag = cachedData && cachedData.etagHeader
-      var cachedResponse = cachedEtag && cachedData.responseData
+      if (etagCacheConfig) {
+        var itemCache = httpEtag.getItemCache(etagCacheConfig.id, etagCacheConfig.itemKey)
+        var cacheInfo = itemCache.info()
+        var cachedData = itemCache.get()
+        var cachedEtag = cachedData && cachedData.etagHeader
+        var cachedResponse = cachedEtag && cachedData.responseData
 
-      // Allow easy access to cache in interceptor
-      httpConfig.$$_itemCache = itemCache
+        // Allow easy access to cache in interceptor
+        httpConfig.$$_itemCache = itemCache
 
-      if (cachedEtag) {
-        httpConfig.headers = angular.extend({}, httpConfig.headers, {
-          'If-None-Match': cachedEtag
-        })
+        if (cachedEtag) {
+          httpConfig.headers = angular.extend({}, httpConfig.headers, {
+            'If-None-Match': cachedEtag
+          })
+        }
       }
     }
 
@@ -94,14 +96,14 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
     } else if (etagValue === true) {
       // Undefined cacheId will use the default cacheId as defined in provider
       etagCacheConfig.itemKey = generateCacheItemKey(httpConfig)
-    }
+    } else return
     return etagCacheConfig
   }
 
   function generateCacheItemKey (httpConfig) {
     var url = httpConfig.url
     var params = stringifyParams(httpConfig.params)
-    return url + (url.indexOf('?') > 0 ? '&' : '?') + params
+    return url + ((params && url.indexOf('?') > 0) ? '&' : '?') + params
   }
 
   // Based on npm package "query-string"
