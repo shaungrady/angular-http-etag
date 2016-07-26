@@ -74,6 +74,11 @@ beforeEach(function () {
     $httpBackend
       .whenGET('/1.json?hello=world&i=think&i=am', isEtag('2000'))
       .respond(304)
+
+    // Server that doesn't respond with ETags
+    $httpBackend
+      .whenGET('/404.json')
+      .respond(mockResponseData)
   })
 })
 
@@ -154,19 +159,28 @@ it('should call `cached` callback with proper arguments', function () {
   $httpBackend.flush()
 })
 
+it('should use the default cacheId with `{ etagCache: true }`', function () {
+  $http.get('/1.json', { etagCache: true })
+  $httpBackend.flush()
+
+  $http.get('/1.json', { etagCache: true })
+    .cached(function (data, status, headers, config, itemCache) {
+      var cacheInfo = itemCache.info()
+      cacheInfo.id.should.equal('httpEtagCache')
+    })
+  $httpBackend.flush()
+})
+
 it('should accept a string specifying desired cacheId', function () {
   $http.get('/1.json', { etagCache: 'testCache' })
-    .cached(cachedSpy)
-    .success(successSpy)
   $httpBackend.flush()
 
   $http.get('/1.json', { etagCache: 'testCache' })
-    .cached(cachedSpy)
-    .error(errorSpy)
+    .cached(function (data, status, headers, config, itemCache) {
+      var cacheInfo = itemCache.info()
+      cacheInfo.id.should.equal('testCache')
+    })
   $httpBackend.flush()
-
-  cachedSpy.should.have.been.called.once
-  errorSpy.should.have.been.called.once
 })
 
 it('should accept an object specifying desired cacheId', function () {
@@ -175,15 +189,137 @@ it('should accept an object specifying desired cacheId', function () {
   }
 
   $http.get('/1.json', { etagCache: cacheConfig })
+  $httpBackend.flush()
+
+  $http.get('/1.json', { etagCache: cacheConfig })
+  .cached(function (data, status, headers, config, itemCache) {
+    var cacheInfo = itemCache.info()
+    cacheInfo.id.should.equal('testCache')
+  })
+  $httpBackend.flush()
+})
+
+it('should accept an object specifying desired cacheId and itemKey', function () {
+  var cacheConfig = {
+    id: 'testCache',
+    itemKey: 'testItemKey'
+  }
+
+  $http.get('/1.json', { etagCache: cacheConfig })
+  $httpBackend.flush()
+
+  $http.get('/1.json', { etagCache: cacheConfig })
+  .cached(function (data, status, headers, config, itemCache) {
+    var cacheInfo = itemCache.info()
+    cacheInfo.id.should.equal('testCache')
+    cacheInfo.itemKey.should.equal('testItemKey')
+  })
+  $httpBackend.flush()
+})
+
+it('should accept a function returning desired cacheId', function () {
+  var cacheConfig = {
+    id: 'testCache'
+  }
+
+  var getCacheConfig = function (httpConfig) {
+    httpConfig.should.be.an('object')
+    httpConfig.method.should.equal('GET')
+    httpConfig.url.should.equal('/1.json')
+    return cacheConfig
+  }
+
+  $http.get('/1.json', { etagCache: getCacheConfig })
+  $httpBackend.flush()
+
+  $http.get('/1.json', { etagCache: getCacheConfig })
+    .cached(function (data, status, headers, config, itemCache) {
+      var cacheInfo = itemCache.info()
+      cacheInfo.id.should.equal('testCache')
+      should.exist(cacheInfo.itemKey)
+    })
+  $httpBackend.flush()
+})
+
+it('should accept a function returning desired cacheId and itemKey', function () {
+  var cacheConfig = {
+    id: 'testCache',
+    itemKey: 'testItemKey'
+  }
+  var getCacheConfig = function (httpConfig) {
+    return cacheConfig
+  }
+
+  $http.get('/1.json', { etagCache: getCacheConfig })
+  $httpBackend.flush()
+
+  $http.get('/1.json', { etagCache: getCacheConfig })
+    .cached(function (data, status, headers, config, itemCache) {
+      var cacheInfo = itemCache.info()
+      cacheInfo.id.should.equal('testCache')
+      cacheInfo.itemKey.should.equal('testItemKey')
+    })
+  $httpBackend.flush()
+})
+
+it('should accept a function returning undefined/false to disable cache', function () {
+  $http.get('/1.json', { etagCache: angular.noop })
+  $httpBackend.flush()
+
+  $http.get('/1.json', { etagCache: angular.noop })
     .cached(cachedSpy)
     .success(successSpy)
   $httpBackend.flush()
 
-  $http.get('/1.json', { etagCache: cacheConfig })
+  cachedSpy.should.not.have.been.called
+  successSpy.should.have.been.called
+})
+
+it('should not cache when etagCache property value is false', function () {
+  $http.get('/1.json', { etagCache: false })
+  $httpBackend.flush()
+
+  $http.get('/1.json', { etagCache: false })
     .cached(cachedSpy)
+    .success(successSpy)
+  $httpBackend.flush()
+
+  cachedSpy.should.not.have.been.called
+  successSpy.should.have.been.called
+})
+
+it('should not cache response data when cache is configured not to', function () {
+  $http.get('/1.json', { etagCache: 'cacheResponseDataFalseTestCache' })
+  $httpBackend.flush()
+
+  $http.get('/1.json', { etagCache: 'cacheResponseDataFalseTestCache' })
+    .cached(cachedSpy)
+    .cached(function (data) {
+      should.not.exist(data)
+    })
+  $httpBackend.flush()
+
+  cachedSpy.should.not.have.been.called
+})
+
+it('should gracefully handle a response without an ETag header', function () {
+  $http.get('/404.json', { etagCache: true })
+    .cached(cachedSpy)
+    .success(successSpy)
     .error(errorSpy)
   $httpBackend.flush()
 
-  cachedSpy.should.have.been.called.once
-  errorSpy.should.have.been.called.once
+  cachedSpy.should.not.have.been.called
+  successSpy.should.have.been.called
+  errorSpy.should.not.have.been.called
+
+  $http.get('/404.json', { etagCache: true })
+    .cached(cachedSpy)
+    .success(successSpy)
+    .error(errorSpy)
+  $httpBackend.flush()
+
+  cachedSpy.should.not.have.been.called
+  successSpy.should.have.been.called.twice
+  errorSpy.should.not.have.been.called
 })
