@@ -6,6 +6,5 @@ engines:
       config: .eslintrc.json
 
 ratings:
-   paths:
-   - "./src/**.js"
-   - "./test/**.js"
+  paths:
+  - "src/**/*.js"
