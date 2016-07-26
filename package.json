@@ -59,12 +59,5 @@
     "node_modules",
     "coverage",
     "test"
-  ],
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "browser": true
-    },
-    "extends": "standard"
-  }
+  ]
 }
