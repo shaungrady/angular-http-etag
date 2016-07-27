@@ -7,43 +7,74 @@
 [![Dependency Status](https://david-dm.org/shaungrady/angular-http-etag.svg)](https://david-dm.org/shaungrady/angular-http-etag)
 [![devDependency Status](https://david-dm.org/shaungrady/angular-http-etag/dev-status.svg)](https://david-dm.org/shaungrady/angular-http-etag#info=devDependencies)
 
-``` javascript
-var userData
+---
 
-$http
-  .get('/users/77.json', {
-    etag: true
+Easy ETag-based caching for `$http` service requests!
+
+* Caches ETag headers and sends them back to the server in the `If-None-Match` header.
+* Flexible configuration.
+* Support for `$cacheFactory`, `sessionStorage`, and `localStorage` caches out-of-the-box.
+* Easily adaptable for other third-party cache services.
+
+**Example Usage:**
+
+``` javascript
+angular
+  .module('myApp', ['angular-http-etag'])
+  .config(function (httpEtagProvider) {
+    httpEtagProvider
+      .defineCache('persistentCache', {
+        cacheService: 'localStorage'
+      })
   })
-  // Synchronous, gets called whenever data
-  // for this request already exists in the cache.
-  .cache(function (cachedData) {
-    if (!userData) userData = cachedData
-  })
-  .success(function (data) {
-    userData = data
-  })
-  .error(function (data, status) {
-    // 304: 'Not Modified', etags matched
-    if (status != 304) alert('Request error')
+
+  .controller('MyCtrl', function ($http) {
+    var self = this
+
+    $http
+      .get('/my_data.json', {
+        etagCache: 'persistentCache'
+      })
+      .success(function (data, status, headers, config, itemCache) {
+        // Modify the data from the server
+        data._fullName = data.first_name + ' ' data.last_name
+        // Update the cache with the modified data
+        itemCache.put(data)
+        // Assign to controller property
+        self.fullName = data._fullName
+      })
+      // Synchronous method called if request was previously cached
+      .cached(function (data, status, headers, config, itemCache) {
+        self.fullName = data._fullName
+      })
+      .error(function (data, status) {
+        // 304: 'Not Modified', etags matched
+        if (status != 304) alert('Request error')
+      })
   })
 ```
 
+## Detailed Documentation
 
-Adds easy ETag-based caching to the `$http` service. It...
+- [Service Provider]
+- [Service]
+- [$http Decorator]
+- [Cache Service Adapters]
 
-* Decorates the `$http` service to provide a synchronous `cache` method on the
-returned promise.
-* Intercepts `$http` responses to cache response data and ETags.
-* Utilizes `$cacheFactory` for in-memory caching; ideal for single-page apps.
-* All leveraged by adding a single property to your `$http` config objects: `etag: true`.
+[Service Provider]: /shaungrady/angular-http-etag/blob/master/docs/service_provider.md
+[Service]: /shaungrady/angular-http-etag/blob/master/docs/service.md
+[$http Decorator]: /shaungrady/angular-http-etag/blob/master/docs/http_decorator.md
+[Cache Service Adapters]: /shaungrady/angular-http-etag/blob/master/docs/cache_service_adapters.md
 
+## Quick Guide
 
-## Installation
+### Install Module
 
-`$ npm install angular-http-etag`
+``` bash
+$ npm install angular-http-etag
+```
 
-
-## Setup
+### Include Dependency
 
 Include `'http-etag'` in your module's dependencies.
 
@@ -51,117 +82,111 @@ Include `'http-etag'` in your module's dependencies.
 // The node module exports the string 'http-etag'...
 angular.module('myApp', [
   require('http-etag')
-]);
+])
+```
 
+``` javascript
 // ... otherwise, include the code first then the module name
 angular.module('myApp', [
   'http-etag'
-]);
+])
 ```
 
-## `httpEtagProvider` Methods
-### `cache(id, [options])`
-Instantiates a `$cacheFactory` cache with the given ID and options.
-The default cache is configured with `{ number: 25 }` under the ID of `default`.
-
-#### Options Object
-| Key | Value | Details |
-|-----|-------|---------|
-| number | `number` |  Optional. If defined, cache becomes a least-recently used (LRU) cache. |
-| keyParser | `function(url, param)` | Optional. If defined, ETag requests using this `cacheId` will have their data cached under the key returned by the `keyParser` function. This allows for predictable cache keys and, by extension, easy use of optimistic caching with the `httpEtag` service.
-
-
+### Define Caches
 
 ``` javascript
-angular
-  .module('MyApp', ['http-etag'])
-  .config(['httpEtagProvider', function (httpEtagProvider) {
-
-    httpEtagProvider
-      .cache('lruCache', { number: 5 })
-      .cache('predictablyKeyedCache', {
-        keyParser: function (url, params) {
-          if (params.id)
-            return params.id;
-          return (url.match(/\/(\d+).json/i) || [])[1];
-        }
-      });
-
-  }]);
+.config(function ('httpEtagProvider') {
+  httpEtagProvider
+    .defineCache('persistentCache', {
+      cacheService: 'localStorage'
+    })
+    .defineCache('sessionCache', {
+      cacheService: 'sessionStorage'
+    })
+    .defineCache('memoryCache', {
+      cacheService: '$cacheFactory',
+      cacheOptions: {
+        number: 50 // LRU cache
+      },
+      deepCopy: true // $cacheFactory copies by reference by default
+    })
+})
 ```
 
+Define the caches you'd like to use by using `defineCache(cacheId[, config])`, passing a cache ID
+followed by the cache configuration. The configuration you pass will extend the
+default configuration, which can be set using the `setDefaultCacheConfig(config)` method. If you don't pass a config, a new cache will be defined using the default config.
 
-## `httpEtag` Service Methods
+When making `$http` requests, if you don't specify a `cacheId` in the request configuration, a default cache ID of `httpEtagCache` will be used.
 
-#### `cacheGet([id], key)`
-Gets the data cached under specified ID and key. If no ID is specified, `default` is used.
+ _See more in the [Service Provider] documentation._
 
-#### `cachePut([id], key, value)`
-Puts the value into the specified cache ID under the specified key. If no ID is specified, `default` is used.
+### Cache Requests
 
+Using the default cache with default configuration and an automatically generated cache itemKey:
 
 ``` javascript
-angular
-  .controler('MyCtrl', ['httpEtag', function (httpEtag) {
+.controller('MyCtrl', function ($http) {
+  var self = this
 
-    // Precache data
-    this.createUser = function createUser (userData) {
-      $http.post('/users.json', userData)
-        .success(function (data) {
-          // Assume server returns new user id under data.id
-          httpEtag.cachePut('predictablyKeyedCache', data.id, userData);
-        })
-    }
+  $http.get('/data', {
+      etagCache: true
+    })
+    .cached(requestHandler)
+    .success(requestHandler)
 
-  }]);
+  function requestHandler(data, status, headers, config, itemCache) {
+    var isCached = status === 'cached'
+
+    itemCache.info()
+    // { deepCopy: false,
+    //   cacheResponseData: true,
+    //   cacheService: '$cacheFactory',
+    //   cacheOptions: { number: 25 },
+    //   id: 'httpEtagCache',
+    //   itemKey: '/data?' }
+  }
+})
 ```
 
-
-
-## `$http` option API
-
-To enable caching/transmission of ETags as well as caching of response data, simply
-add the `etag` property to the configuration object passed to your `$http` calls.
-
-The value can either be `true`, in which case the default `httpEtag` cache will
-be used, or it can be the ID of a cache you've configured with `httpEtagProvider`.
-
-For valid `$http` requests that have the `etag` property in their configuration,
-a new method will be attached to the returned promise: `cache(function)`. It's
-important to note that, unlike the other promise methods, `cache` is synchronous.
-If the request has previously been cached, the function passed to `cache` will
-be called with the previously cached data. If no cached data exists, the function
-will not be called.
-
----
-
-An example of basic usage utilizing the default cache (25-entry LRU `$cacheFactory` cache):
+Using a defined cache from the previous section and an automatically generated cache itemKey:
 
 ``` javascript
-var userData;
+.controller('MyCtrl', function ($http) {
+  var self = this
 
-$http.get('/users/77.json', {
-    etag: true // Or 'lruCache', 'predictablyKeyedCache', etc.
-  })
+  $http.get('/data', {
+      etagCache: 'persistentCache'
+    })
+    .cached(requestHandler)
+    .success(requestHandler)
 
-  // Synchronous method, calls fn with cached data if cached data exists
-  .cache(function (data) {
-    if (!userData)
-      userData = data;
-  })
-
-  // Successful request, ETag is cached and sent in subsequent requests, response
-  // data is cached and sent to functions passed to the {promise}.cache method
-  .success(function (data) {
-    userData = data;
-  })
-
-  // If status == 304, data wasn't modified, and it generally shouldn't
-  // be treated as an error. Since data isn't sent from the server, the
-  // {promise}.cache method above ensures you have the freshest data cached
-  // from a previous request.
-  .error(function (data, status) {
-    if (status != 304)
-      alert('Request error');
-  });
+  function requestHandler(data, status, headers, config, itemCache) {
+    itemCache.info()
+    // { deepCopy: false,
+    //   cacheResponseData: true,
+    //   cacheService: 'localStorage',
+    //   cacheOptions: { number: 25 },
+    //   id: 'httpEtagCache',
+    //   itemKey: '/data?' }
+  }
+})
 ```
+
+The `etagCache` `$http` config property accepts the following value types:
+
+- `boolean` - If `true`, use default cache, itemKey.
+- `string` - String representing the `cacheId` to be used.
+- `object` - See below for spec.
+- `function` - A function that returns one of the above values. The current `$http` config is passed an argument.
+
+Config object with optional `itemKey` property. If not specified, one will be generated.
+
+``` javascript
+{
+  cacheId: 'sessionCache',
+  itemKey: 'specifiedKey' // Optional property
+}
+```
+
+ _See more in the [$http Decorator] documentation._
