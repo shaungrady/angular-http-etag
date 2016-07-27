@@ -315,9 +315,6 @@ it('should not cache response data when cache is configured not to', function ()
 
   $http.get('/1.json', { etagCache: 'cacheResponseDataFalseTestCache' })
     .cached(cachedSpy)
-    .cached(function (data) {
-      should.not.exist(data)
-    })
   $httpBackend.flush()
 
   cachedSpy.should.not.have.been.called
