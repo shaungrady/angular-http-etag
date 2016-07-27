@@ -51,8 +51,16 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
     httpPromise = $http.apply($http, arguments)
 
     httpPromise.cached = function (callback) {
-      if (isCachable && cachedData && cacheInfo.cacheResponseData) callback(cachedResponse, undefined, undefined, httpConfig, itemCache)
+      if (isCachable && cachedData && cacheInfo.cacheResponseData) callback(cachedResponse, 'cached', undefined, httpConfig, itemCache)
       return httpPromise
+    }
+
+    if (itemCache) {
+      var onSuccess = httpPromise.success
+      httpPromise.success = function (callback) {
+        var partialCallback = partial(callback, undefined, undefined, undefined, undefined, itemCache)
+        return onSuccess(partialCallback)
+      }
     }
 
     return httpPromise
@@ -125,6 +133,18 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
 
       return encodeURIComponent(key) + '=' + encodeURIComponent(val)
     }).join('&') : ''
+  }
+
+  // http://ejohn.org/blog/partial-functions-in-javascript/
+  function partial (fn) {
+    var args = Array.prototype.slice.call(arguments, 1)
+    return function () {
+      var arg = 0
+      for (var i = 0; i < args.length && arg < arguments.length; i++) {
+        if (args[i] === undefined) args[i] = arguments[arg++]
+      }
+      return fn.apply(this, args)
+    }
   }
 
   return $httpDecorator
