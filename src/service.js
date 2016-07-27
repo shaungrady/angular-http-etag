@@ -36,9 +36,9 @@ function httpEtagProvider () {
 
   // Cache config defaults
   var defaultCacheId = 'httpEtagCache'
-  var defaultEtagCacheOptions = {
-    cacheResponseData: true,
+  var defaultEtagCacheConfig = {
     deepCopy: false,
+    cacheResponseData: true,
     cacheService: '$cacheFactory',
     cacheOptions: {
       number: 25
@@ -47,23 +47,23 @@ function httpEtagProvider () {
 
   /**
    * SERVICE PROVIDER
-   * .setDefaultCacheOptions(options)
-   * .defineCache(cacheId, options)
+   * .setDefaultCacheConfig(config)
+   * .defineCache(cacheId, config)
    * .defineCacheServiceAdapter(serviceName, config)
    * .getCacheServiceAdapter(serviceName)
    */
 
-  httpEtagProvider.setDefaultCacheOptions = function httpEtagSetDefaultCacheOptions (options) {
-    defaultEtagCacheOptions = angular.extend({}, defaultEtagCacheOptions, options)
+  httpEtagProvider.setDefaultCacheConfig = function httpEtagSetDefaultCacheOptions (config) {
+    defaultEtagCacheConfig = angular.extend({}, defaultEtagCacheConfig, config)
     return httpEtagProvider
   }
 
-  httpEtagProvider.getDefaultCacheOptions = function httpEtagGetDefaultCacheOptions () {
-    return defaultEtagCacheOptions
+  httpEtagProvider.getDefaultCacheConfig = function httpEtagGetDefaultCacheOptions () {
+    return defaultEtagCacheConfig
   }
 
-  httpEtagProvider.defineCache = function httpEtagDefineCache (cacheId, options) {
-    var config = angular.extend({}, defaultEtagCacheOptions, options, { id: cacheId })
+  httpEtagProvider.defineCache = function httpEtagDefineCache (cacheId, config) {
+    config = angular.extend({}, defaultEtagCacheConfig, config, { id: cacheId })
     cacheDefinitions[cacheId] = config
     return httpEtagProvider
   }

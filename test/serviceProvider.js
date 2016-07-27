@@ -21,12 +21,12 @@ beforeEach(function () {
   })
 })
 
-it('should allow for getting default cache creation options', function () {
-  var defaultConfig = httpEtagProvider.getDefaultCacheOptions()
+it('should allow for getting default cache creation config', function () {
+  var defaultConfig = httpEtagProvider.getDefaultCacheConfig()
   defaultConfig.should.be.an('object')
 })
 
-it('should allow for setting default cache creation options', function () {
+it('should allow for setting default cache creation config', function () {
   var newOptions = {
     cacheService: 'RonaldMcD',
     cacheOptions: {
@@ -35,8 +35,8 @@ it('should allow for setting default cache creation options', function () {
   }
 
   var newDefaultOptions = httpEtagProvider
-    .setDefaultCacheOptions(newOptions)
-    .getDefaultCacheOptions()
+    .setDefaultCacheConfig(newOptions)
+    .getDefaultCacheConfig()
 
   newDefaultOptions.cacheService.should.equal(newOptions.cacheService)
   newDefaultOptions.cacheOptions.weightIncrease.should.equal(newOptions.cacheOptions.weightIncrease)
