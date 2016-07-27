@@ -57,6 +57,7 @@
   "ignore": [
     "**/.*",
     "node_modules",
+    "docs",
     "coverage",
     "test"
   ]
