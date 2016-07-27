@@ -147,7 +147,7 @@ it('should call `cached` callback with proper arguments', function () {
   $http(httpConfig)
     .cached(function (data, status, headers, config, itemCache) {
       data.should.deep.equal(mockResponseData)
-      should.not.exist(status)
+      status.should.equal('cached')
       should.not.exist(headers)
       config.method.should.equal(httpConfig.method)
       config.url.should.equal(httpConfig.url)
@@ -156,6 +156,27 @@ it('should call `cached` callback with proper arguments', function () {
       cacheInfo.id.should.equal('httpEtagCache')
     })
     .error(errorSpy)
+  $httpBackend.flush()
+})
+
+it('should call `success` callback with proper arguments', function () {
+  var httpConfig = {
+    method: 'GET',
+    url: '/1.json',
+    etagCache: true
+  }
+
+  $http(httpConfig)
+    .success(function (data, status, headers, config, itemCache) {
+      data.should.deep.equal(mockResponseData)
+      status.should.equal(200)
+      headers.should.be.a('function')
+      config.method.should.equal(httpConfig.method)
+      config.url.should.equal(httpConfig.url)
+      config.etagCache.should.equal(httpConfig.etagCache)
+      var cacheInfo = itemCache.info()
+      cacheInfo.id.should.equal('httpEtagCache')
+    })
   $httpBackend.flush()
 })
 
