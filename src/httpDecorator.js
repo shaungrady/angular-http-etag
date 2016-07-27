@@ -117,7 +117,9 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
   function generateCacheItemKey (httpConfig) {
     var url = httpConfig.url
     var params = stringifyParams(httpConfig.params)
-    return url + ((params && url.indexOf('?') > 0) ? '&' : '?') + params
+    var joiner = ((params && url.indexOf('?') > 0) ? '&' : '?')
+    var queryString = (params && joiner + params) || ''
+    return url + queryString
   }
 
   // Based on npm package "query-string"
