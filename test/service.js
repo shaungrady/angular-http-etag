@@ -7,7 +7,22 @@ var should = chai.should()
 var httpEtagProvider
 var httpEtag
 
+var cacheIds = [
+  '$cacheFactoryTestCache',
+  'localStorageTestCache',
+  'sessionStorageTestCache'
+]
+var testValue
+var testRawValue
+
 beforeEach(function () {
+  testValue = [{ hi: true, mom: [{ 1: '😍' }] }]
+  testRawValue = {
+    responseData: testValue,
+    etagHeader: '101',
+    other: testValue
+  }
+
   angular
     .module('test', ['http-etag'])
     .config(['httpEtagProvider', function (__httpEtagProvider) {
@@ -87,13 +102,6 @@ it('`getItemCache` method should return undefined when bad cacheId is specified'
  */
 
 describe('Cache Object', function () {
-  var testValue = [{ hi: true, mom: [{ 1: '😍' }] }]
-  var cacheIds = [
-    '$cacheFactoryTestCache',
-    'localStorageTestCache',
-    'sessionStorageTestCache'
-  ]
-
   describe('`info` method should return cache info', function () {
     cacheIds.forEach(function (id) {
       it('(using ' + id.replace('TestCache', '') + ')', function () {
@@ -113,7 +121,55 @@ describe('Cache Object', function () {
     })
   })
 
-  describe('`removeItem` should remove item data', function () {
+  describe('`$setItem` and `$getItem` should interact with the raw cache value', function () {
+    cacheIds.forEach(function (id) {
+      it('(using ' + id.replace('TestCache', '') + ')', function () {
+        var cache = httpEtag.getCache(id)
+        cache.$setItem('test', testRawValue)
+
+        var value = cache.getItem('test')
+        var rawValue = cache.$getItem('test')
+
+        value.should.deep.equal(testRawValue.responseData)
+        rawValue.should.deep.equal(testRawValue)
+      })
+    })
+  })
+
+  describe('`unsetItem` should remove response data', function () {
+    cacheIds.forEach(function (id) {
+      it('(using ' + id.replace('TestCache', '') + ')', function () {
+        var cache = httpEtag.getCache(id)
+        cache.$setItem('test', testRawValue)
+        cache.unsetItem('test')
+
+        var value = cache.getItem('test')
+        var rawValue = cache.$getItem('test')
+
+        should.not.exist(value)
+        should.not.exist(rawValue.responseData)
+        rawValue.etagHeader.should.deep.equal(testRawValue.etagHeader)
+        rawValue.other.should.deep.equal(testRawValue.other)
+      })
+    })
+  })
+
+  describe('`expireItem` should remove etag data', function () {
+    cacheIds.forEach(function (id) {
+      it('(using ' + id.replace('TestCache', '') + ')', function () {
+        var cache = httpEtag.getCache(id)
+        cache.$setItem('test', testRawValue)
+        cache.expireItem('test')
+
+        var rawValue = cache.$getItem('test')
+
+        should.not.exist(rawValue.etagHeader)
+        should.exist(rawValue.responseData)
+      })
+    })
+  })
+
+  describe('`removeItem` should remove all item data', function () {
     cacheIds.forEach(function (id) {
       it('(using ' + id.replace('TestCache', '') + ')', function () {
         var cache = httpEtag.getCache(id)
@@ -190,13 +246,6 @@ describe('Cache Object', function () {
  */
 
 describe('Item Cache Object', function () {
-  var testValue = [{ hi: true, mom: [{ 1: '😍' }] }]
-  var cacheIds = [
-    '$cacheFactoryTestCache',
-    'localStorageTestCache',
-    'sessionStorageTestCache'
-  ]
-
   describe('`info` method should return cache info', function () {
     cacheIds.forEach(function (id) {
       it('(using ' + id.replace('TestCache', '') + ')', function () {
@@ -212,6 +261,54 @@ describe('Item Cache Object', function () {
         var itemCache = httpEtag.getItemCache(id, 'test')
         itemCache.set(testValue)
         itemCache.get().should.deep.equal(testValue)
+      })
+    })
+  })
+
+  describe('`$set` and `$get` should interact with the raw cache value', function () {
+    cacheIds.forEach(function (id) {
+      it('(using ' + id.replace('TestCache', '') + ')', function () {
+        var itemCache = httpEtag.getItemCache(id, 'test')
+        itemCache.$set(testRawValue)
+
+        var value = itemCache.get()
+        var rawValue = itemCache.$get()
+
+        value.should.deep.equal(testRawValue.responseData)
+        rawValue.should.deep.equal(testRawValue)
+      })
+    })
+  })
+
+  describe('`unset` should remove response data', function () {
+    cacheIds.forEach(function (id) {
+      it('(using ' + id.replace('TestCache', '') + ')', function () {
+        var itemCache = httpEtag.getItemCache(id, 'test')
+        itemCache.$set(testRawValue)
+        itemCache.unset()
+
+        var value = itemCache.get()
+        var rawValue = itemCache.$get()
+
+        should.not.exist(value)
+        should.not.exist(rawValue.responseData)
+        rawValue.etagHeader.should.deep.equal(testRawValue.etagHeader)
+        rawValue.other.should.deep.equal(testRawValue.other)
+      })
+    })
+  })
+
+  describe('`expire` should remove etag data', function () {
+    cacheIds.forEach(function (id) {
+      it('(using ' + id.replace('TestCache', '') + ')', function () {
+        var itemCache = httpEtag.getItemCache(id, 'test')
+        itemCache.$set(testRawValue)
+        itemCache.expire()
+
+        var rawValue = itemCache.$get()
+
+        should.not.exist(rawValue.etagHeader)
+        should.exist(rawValue.responseData)
       })
     })
   })

@@ -23,13 +23,6 @@ function httpEtagProvider () {
 
   var requiredAdapterMethods = serviceAdapterMethods.concat(cacheAdapterMethods)
 
-  var itemCacheMethods = [
-    'set',
-    'get',
-    'remove'
-    // info method hard-coded
-  ]
-
   // Built-in adapters defined in ./cacheServiceAdapters.js
   var cacheAdapters = {}
   var cacheDefinitions = {}
@@ -121,24 +114,60 @@ function httpEtagProvider () {
       // Determine whether to perform deepcopying or not
       var serviceDeepCopies = cacheAdapters[config.cacheService].config.storesDeepCopies
       var deepCopy = !serviceDeepCopies && cacheDefinitions[cacheId].deepCopy
+      var copy = function (value) {
+        return deepCopy ? deepcopy(value) : value
+      }
 
       angular.forEach(cacheAdapterMethods, function (method) {
-        var methodFn = cacheAdapters[config.cacheService].methods[method]
-        var deepCopyWrapperFn
+        var adapterMethod = cacheAdapters[config.cacheService].methods[method]
+        var wrappedMethod
+        var wrappedRawMethod
 
-        if (deepCopy && method === 'setItem') {
-          deepCopyWrapperFn = function setItemDeepCopyWrapper (cache, itemKey, value, options) {
-            methodFn(cache, itemKey, deepcopy(value), options)
+        // Wrap set/get methods to set/get to the `responseData` property of an
+        // object. This is where the $http interceptor stores response data.
+        if (method === 'getItem') {
+          wrappedMethod = function getCacheItemResponseData (cache, itemKey, options) {
+            var cachedData = adapterMethod(cache, itemKey, options)
+            return cachedData && copy(cachedData.responseData)
           }
-        } else if (deepCopy && method === 'getItem') {
-          deepCopyWrapperFn = function setItemDeepCopyWrapper (cache, itemKey, options) {
-            return deepcopy(methodFn(cache, itemKey, options))
+
+          wrappedRawMethod = function getCacheItemData (cache, itemKey, options) {
+            return copy(adapterMethod(cache, itemKey, options))
           }
         }
 
-        adaptedCache[method] = angular.bind({}, (deepCopyWrapperFn || methodFn), cache)
+        if (method === 'setItem') {
+          wrappedMethod = function setCacheItemResponseData (cache, itemKey, value, options) {
+            var cachedData = adaptedCache.$getItem(itemKey)
+            value = copy(value)
+
+            if (cachedData && typeof cachedData === 'object') {
+              cachedData.responseData = value
+              value = cachedData
+            } else value = { responseData: value }
+
+            adapterMethod(cache, itemKey, value, options)
+          }
+
+          wrappedRawMethod = function setCacheItemData (cache, itemKey, value, options) {
+            adapterMethod(cache, itemKey, copy(value), options)
+          }
+        }
+
+        adaptedCache[method] = angular.bind({}, (wrappedMethod || adapterMethod), cache)
+        if (wrappedRawMethod) {
+          adaptedCache['$' + method] = angular.bind({}, wrappedRawMethod, cache)
+        }
       })
 
+      adaptedCache.unsetItem = function adaptedCacheUnsetItemCache (itemKey) {
+        adaptedCache.setItem(itemKey, undefined)
+      }
+      adaptedCache.expireItem = function adaptedCacheUnsetItemCache (itemKey) {
+        var data = adaptedCache.$getItem(itemKey)
+        delete data.etagHeader
+        adaptedCache.$setItem(itemKey, data)
+      }
       adaptedCache.getItemCache = function adaptedCacheGetItemCache (itemKey) {
         return httpEtagService.getItemCache(cacheId, itemKey)
       }
@@ -159,14 +188,20 @@ function httpEtagProvider () {
     httpEtagService.getItemCache = function httpEtagServiceGeItemCache (cacheId, itemKey) {
       var cache = httpEtagService.getCache(cacheId)
       var itemCache = {}
-
       if (!cache) return
 
-      angular.forEach(cacheAdapterMethods, function (method, i) {
-        var itemCacheMethod = itemCacheMethods[i]
-        if (itemCacheMethod) {
-          itemCache[itemCacheMethod] = angular.bind({}, cache[method], itemKey)
-        }
+      var methodMappings = [
+        ['set', 'setItem'],
+        ['get', 'getItem'],
+        ['$set', '$setItem'],
+        ['$get', '$getItem'],
+        ['unset', 'unsetItem'],
+        ['expire', 'expireItem'],
+        ['remove', 'removeItem']
+      ]
+
+      angular.forEach(methodMappings, function (methods) {
+        itemCache[methods[0]] = angular.bind({}, cache[methods[1]], itemKey)
       })
 
       itemCache.info = function itemCacheInfo () {
