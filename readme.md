@@ -12,15 +12,17 @@
 Easy ETag-based caching for `$http` service requests!
 
 * Caches ETag headers and sends them back to the server in the `If-None-Match` header.
-* Flexible configuration.
+* Caches response data with flexible cache configuration.
 * Support for `$cacheFactory`, `sessionStorage`, and `localStorage` caches out-of-the-box.
-* Easily adaptable for other third-party cache services.
+* Easily [adaptable][Cache Service Adapters] for other third-party cache services.
 
 **Example Usage:**
 
 ``` javascript
 angular
-  .module('myApp', ['angular-http-etag'])
+  .module('myApp', [
+    'angular-http-etag'
+  ])
   .config(function (httpEtagProvider) {
     httpEtagProvider
       .defineCache('persistentCache', {
@@ -39,7 +41,7 @@ angular
         // Modify the data from the server
         data._fullName = data.first_name + ' ' data.last_name
         // Update the cache with the modified data
-        itemCache.put(data)
+        itemCache.set(data)
         // Assign to controller property
         self.fullName = data._fullName
       })
@@ -48,11 +50,13 @@ angular
         self.fullName = data._fullName
       })
       .error(function (data, status) {
-        // 304: 'Not Modified', etags matched
+        // 304: 'Not Modified'--Etag matched, cached data is fresh
         if (status != 304) alert('Request error')
       })
   })
 ```
+
+_Need more information on how ETags work? [Stack Overflow](http://stackoverflow.com/questions/499966/etag-vs-header-expires) has your back._
 
 ## Detailed Documentation
 
@@ -123,64 +127,61 @@ When making `$http` requests, if you don't specify a `cacheId` in the request co
 
 ### Cache Requests
 
-Using the default cache with default configuration and an automatically generated cache itemKey:
+Using the default cache with default configuration and an automatically generated cache itemKey based on the request:
 
 ``` javascript
-.controller('MyCtrl', function ($http) {
-  var self = this
+$http.get('/data', {
+    etagCache: true
+  })
+  .cached(requestHandler)
+  .success(requestHandler)
 
-  $http.get('/data', {
-      etagCache: true
-    })
-    .cached(requestHandler)
-    .success(requestHandler)
+function requestHandler(data, status, headers, config, itemCache) {
+  // Differentiating between cached and successful request responses
+  var isCached = status === 'cached'
 
-  function requestHandler(data, status, headers, config, itemCache) {
-    var isCached = status === 'cached'
-
-    itemCache.info()
-    // { deepCopy: false,
-    //   cacheResponseData: true,
-    //   cacheService: '$cacheFactory',
-    //   cacheOptions: { number: 25 },
-    //   id: 'httpEtagCache',
-    //   itemKey: '/data?' }
-  }
-})
+  // itemCache is a cache object bound to the cache item associated with this request.
+  itemCache.info()
+  // { deepCopy: false,
+  //   cacheResponseData: true,
+  //   cacheService: '$cacheFactory',
+  //   cacheOptions: { number: 25 },
+  //   id: 'httpEtagCache',
+  //   itemKey: '/data' }
+}
 ```
-
 Using a defined cache from the previous section and an automatically generated cache itemKey:
 
 ``` javascript
-.controller('MyCtrl', function ($http) {
-  var self = this
+$http.get('/data', {
+    etagCache: 'persistentCache'
+  })
+  .cached(requestHandler)
+  .success(requestHandler)
 
-  $http.get('/data', {
-      etagCache: 'persistentCache'
-    })
-    .cached(requestHandler)
-    .success(requestHandler)
-
-  function requestHandler(data, status, headers, config, itemCache) {
-    itemCache.info()
-    // { deepCopy: false,
-    //   cacheResponseData: true,
-    //   cacheService: 'localStorage',
-    //   cacheOptions: { number: 25 },
-    //   id: 'httpEtagCache',
-    //   itemKey: '/data?' }
-  }
-})
+function requestHandler(data, status, headers, config, itemCache) {
+  itemCache.info()
+  // { deepCopy: false,
+  //   cacheResponseData: true,
+  //   cacheService: 'localStorage',
+  //   cacheOptions: { number: 25 },
+  //   id: 'httpEtagCache',
+  //   itemKey: '/data' }
+}
 ```
+
+#### etagCache Property
 
 The `etagCache` `$http` config property accepts the following value types:
 
-- `boolean` - If `true`, use default cache, itemKey.
-- `string` - String representing the `cacheId` to be used.
-- `object` - See below for spec.
-- `function` - A function that returns one of the above values. The current `$http` config is passed an argument.
+| Type | Details |
+| :-- | :-- |
+| `boolean` | If `true`, use default `cacheId` and `itemKey`. |
+| `string` | String representing the `cacheId` to be used. |
+| `object.<string>` | Object with `cacheId` property and optional `itemKey` property. See below. |
+| `function` | A function that returns one of the above value types. The current `$http` config is passed an argument. |
 
-Config object with optional `itemKey` property. If not specified, one will be generated.
+Config object with optional `itemKey` property. If not specified, one will be generated based on the request URL/params.
 
 ``` javascript
 {
@@ -189,4 +190,17 @@ Config object with optional `itemKey` property. If not specified, one will be ge
 }
 ```
 
- _See more in the [$http Decorator] documentation._
+#### itemCache Object
+
+The `itemCache` object passed to `cached` and `success` callbacks has these methods:
+
+| Method | Details |
+| :-- | :-- |
+| `info()` | Return info about this cacheItem |
+| `set(value[, options])` | Update the cache with the passed value and optional options (if the cache service supports options) |
+| `get([options])` | Get the cache contents with optional options (if the cache service supports options) |
+| `unset()` | Remove cached data while preserving the cached ETag. |
+| `expire()` | Remove cached ETag while preserving the cached data. |
+| `remove()` | Clear the cached response data and ETag. |
+
+ _See more in the [$http Decorator] and [Service] documentation._
