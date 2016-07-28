@@ -1,6 +1,6 @@
 # Service
 
-Manipulate defined caches through the service.
+Manipulate caches and cache items defined through the [Service Provider](service_provider.md).
 
 ## httpEtag Service
 
@@ -41,21 +41,21 @@ Manipulate defined caches through the service.
 | Method | Details |
 | :-- | :-- |
 | `info()` | Returns an object with information about the cache configuration. |
-| `getCache([cacheId])` | Returns a `cache` object matching the specified `cacheId`. If no `cacheId` is specified, the default cache is returned. |
-| `getItemCache(cacheId, itemKey)` | Returns an `itemCache`—a `cache` object that's bound to the specified item. |
+| `getCache([cacheId])` | Returns a `cache` object matching the specified `cacheId`.<br>If no `cacheId` is specified, the default cache is returned. |
+| <div class="no-wrap">`getItemCache(cacheId, itemKey)`</div> | Returns an `itemCache`—a `cache` object that's bound to the specified item.<br>A shortcut for `httpEtag.getCache('id').getCacheItem('itemKey')`. |
 
-There are two kinds of cache objects. A `cache` and an `itemCache`. A `cache` object can interact with all items or a specific item within that cache. An `itemCache` only interacts with a specific item in a cache. They share many of the same methods, but with a small difference in naming. They are detailed below.
+There are two kinds of cache objects. A `cache` and an `itemCache`. A `cache` object can interact with all items or a specific item within that cache. An `itemCache` only interacts with a specific item in a cache. They share many of the same methods, but with a small difference in naming. The `itemCache` is detailed below.
 
 ## cache Object
 
-On `setItem` and `getItem` options: Some cache services may allow for additional options to be passed when setting or getting cache data; `$cacheFactory`, `localStorage`, and `sessionStorage` do not, but a third-party cache service defined using a [Cache Service Adapter](cache_service_adapter.md) may.
+On `setItem` and `getItem` options: Some cache services may allow for additional options to be passed when setting or getting cache data; `$cacheFactory`, `localStorage`, and `sessionStorage` do not, but a third-party cache service defined using a [Cache Service Adapter](cache_service_adapters.md) may.
 
 | Method | Details |
 | :-- | :-- |
-| `setItem(itemKey, value[, options])` | Insert a value into the cache under the specified `itemKey`. |
-| `getItem(itemKey[, options])` | Retrieve data from the cache under the specified `itemKey`. |
-| `unsetItem(itemKey)` | Unset data in the cache under the specified `itemKey`.<br>**Note:** This will not remove a cached ETag header associated with this cache item. |
-| `expireItem(itemKey)` | Unset a cached ETag associated with this cache item.<br>**Note:** This will not remove data stored in the cache under the specified `itemKey` |
+| <div class="no-wrap">`setItem(itemKey, value[, options])`</div> | Insert a value into the cache under the `itemKey`. |
+| `getItem(itemKey[, options])` | Retrieve data from the cache under the `itemKey`. |
+| `unsetItem(itemKey)` | Unset data in the cache under the `itemKey`.<br>This does not remove a cached ETag header associated with the cache item. |
+| `expireItem(itemKey)` | Unset a cached ETag associated with this cache item.<br>This does not remove data stored in the cache item. |
 | `removeItem(itemKey)` | Remove the cached data and ETag associated with the specified `itemKey`. |
 | `removeAllItems()` | Remove cached data and ETags from all items stored in the cache. |
 | `getItemCache(itemKey)` | Retrieve an `itemCache` object bound to the specified `itemKey`. |
@@ -63,12 +63,15 @@ On `setItem` and `getItem` options: Some cache services may allow for additional
 
 ## itemCache Object
 
-
+When using an ETag cache with the `$http` service, an `itemCache` object is passed as the 5th argument to `success` and `cached` callbacks. The methods detailed below.
 
 | Method | Details |
 | :-- | :-- |
 | `set(value[, options])` | Insert a value into the cache item. |
 | `get([options])` | Retrieve data from the cache item. |
-| `unset()` | Unset data in the cache item.<br>**Note:** This will not remove a cached ETag header associated with this cache item. |
-| `expire()` | Unset a cached ETag associated with this cache item.<br>**Note:** This will not remove data stored in this cache item. |
+| `unset()` | Unset data in the cache item.<br>This does not remove a cached ETag header associated with the cache item. |
+| `expire()` | Unset a cached ETag associated with this cache item.<br>This does not remove data stored in the cache item. |
 | `remove()` | Remove the cached data and ETag associated with the cache item. |
+
+
+_See more in the [$http Decorator](http_decorator.md) documentation._
