@@ -67,10 +67,10 @@ _Need more information on how ETags work? [Stack Overflow](http://stackoverflow.
 - [$http Decorator]
 - [Cache Service Adapters]
 
-[Service Provider]: /shaungrady/angular-http-etag/blob/master/docs/service_provider.md
-[Service]: /shaungrady/angular-http-etag/blob/master/docs/service.md
-[$http Decorator]: /shaungrady/angular-http-etag/blob/master/docs/http_decorator.md
-[Cache Service Adapters]: /shaungrady/angular-http-etag/blob/master/docs/cache_service_adapters.md
+[Service Provider]: /docs/service_provider.md
+[Service]: /docs/service.md
+[$http Decorator]: /docs/http_decorator.md
+[Cache Service Adapters]: /docs/cache_service_adapters.md
 
 ## Quick Guide
 
