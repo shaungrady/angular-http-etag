@@ -63,7 +63,7 @@ On `setItem` and `getItem` options: Some cache services may allow for additional
 
 ## itemCache Object
 
-When using an ETag cache with the `$http` service, an `itemCache` object is passed as the 5th argument to `success` and `cached` callbacks. The methods detailed below.
+When using an ETag cache with the `$http` service, an `itemCache` object is passed as the 5th argument to `success` and `cached` callbacks. [Read more about the $http Decorator here](http_decorator.md).
 
 | Method | Details |
 | :-- | :-- |
@@ -72,6 +72,3 @@ When using an ETag cache with the `$http` service, an `itemCache` object is pass
 | `unset()` | Unset data in the cache item.<br>This does not remove a cached ETag header associated with the cache item. |
 | `expire()` | Unset a cached ETag associated with this cache item.<br>This does not remove data stored in the cache item. |
 | `remove()` | Remove the cached data and ETag associated with the cache item. |
-
-
-_See more in the [$http Decorator](http_decorator.md) documentation._

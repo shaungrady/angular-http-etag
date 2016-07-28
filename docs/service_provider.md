@@ -3,7 +3,7 @@
 Define caches with specific configurations and define adapters for 3rd-party
 cache services.
 
-Example usage:
+**Example usage:**
 
 ``` javascript
 angular
@@ -32,36 +32,53 @@ angular
 
 ---
 
-**Methods**
 
--   [`defineCache(id[, config])`](#defineCache)
--   [`setDefaultCacheConfig(config)`](#setDefaultCacheConfig)
--   `getDefaultCacheOptions()`
--   `defineCacheServiceAdapter(name, config)`
--   `getCacheServiceAdapter()`
+| Method | Details |
+| :-- | :-- |
+| [`defineCache(id[, config])`](#defineCache) | Define a cache with default or specified config (extends default). |
+| [`setDefaultCacheConfig(config)`](#setDefaultCacheConfig) | Define the default cache config. |
+| `getDefaultCacheConfig()` | Get default config. |
+| `defineCacheServiceAdapter(name, config)` | Define a [Cache Service Adapter](cache_service_adapters.md) for third-party cache support. |
+| `getCacheServiceAdapter(name)` | Get named [Cache Service Adapter](cache_service_adapters.md) config. |
 
 ---
 
 ## defineCache
 
-``` javascript
-httpEtagProvider
-  .defineCache('cacheWithDefaultConfig')
-  .defineCache('cacheWithConfig', {
-    cacheService: 'sessionStorage'
-  })
-```
+`httpEtagProvider.defineCache(id[, config])`
 
-Define a new cache with an ID and an optional configuration. Returns provider.
-If no configuration is specified, the default configuration is used. The default
-can be set using [`setDefaultCacheConfig()`](#setDefaultCacheConfig).
-
-| Param | Type | Details |
+| Argument | Type | Details |
 | -- | -- | -- |
 | `id` | `string` | A unique string representing the ID of the cache. |
 | `config` | `object` | Object describing the configuration of the cache. See section below for details |
 
-### Config Object
+Define a new cache with an ID and an optional configuration. Returns provider.
+If a configuration is specified, it will extend the default config.
+If no configuration is specified, the default configuration is used. The default
+can be set using [`setDefaultCacheConfig()`](#setDefaultCacheConfig).
+
+**Example usage:**
+
+``` javascript
+httpEtagProvider
+  .defineCache('cacheWithDefaultConfig')
+  .defineCache('cacheWithConfig', {
+    // Extends the default config
+    cacheService: 'sessionStorage'
+  })
+```
+
+
+## setDefaultCacheConfig
+
+`setDefaultCacheConfig(config)`
+
+| Config Property | Type | Details |
+| :-- | :-- | :-- |
+| `cacheService` | `string` | Name of cache service the cache will use.<br>Built-in support for `$cacheFactory`, `localStorage`, and `sessionStorage`. |
+| `cacheOptions` | `object` | Options passed to the cache service when instantiating the cache. |
+| `deepCopy` | `boolean` | Create a deep copy of the data when setting and getting cache data. |
+| `cacheResponseData` | `boolean` | Whether or not the response data should be cached. ETag header will be cached regardless.
 
 Default configuration:
 
@@ -75,12 +92,3 @@ Default configuration:
   cacheResponseData: true
 }
 ```
-
-| Property | Type | Details |
-| -- | -- |
-| `cacheService` | `string` | Name of cache service this cache will use. |
-| `cacheOptions` | `object` | Options passed to the cache service when instantiating this cache. |
-| `deepCopy` | `boolean` | Create a deep copy of the data when setting and getting cache data. |
-| `cacheResponseData` | `boolean` | Whether or not the response data should be cached. ETag header will be cached regardless. |
-
-## setDefaultCacheConfig

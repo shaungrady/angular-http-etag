@@ -192,7 +192,7 @@ Config object with optional `itemKey` property. If not specified, one will be ge
 
 #### itemCache Object
 
-The `itemCache` object passed to `cached` and `success` callbacks has these methods:
+The `itemCache` object that is passed to `cached` and `success` callbacks has these methods:
 
 | Method | Details |
 | :-- | :-- |
