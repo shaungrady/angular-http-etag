@@ -42,7 +42,7 @@ Manipulate caches and cache items defined through the [Service Provider](service
 | :-- | :-- |
 | `info()` | Returns an object with information about the cache configuration. |
 | `getCache([cacheId])` | Returns a `cache` object matching the specified `cacheId`.<br>If no `cacheId` is specified, the default cache is returned. |
-| <div class="no-wrap">`getItemCache(cacheId, itemKey)`</div> | Returns an `itemCache`—a `cache` object that's bound to the specified item.<br>A shortcut for `httpEtag.getCache('id').getCacheItem('itemKey')`. |
+| `getItemCache(cacheId, itemKey)` | Returns an `itemCache`—a `cache` object that's bound to the specified item.<br>A shortcut for `httpEtag.getCache('id').getCacheItem('itemKey')`. |
 
 There are two kinds of cache objects. A `cache` and an `itemCache`. A `cache` object can interact with all items or a specific item within that cache. An `itemCache` only interacts with a specific item in a cache. They share many of the same methods, but with a small difference in naming. The `itemCache` is detailed below.
 
@@ -52,7 +52,7 @@ On `setItem` and `getItem` options: Some cache services may allow for additional
 
 | Method | Details |
 | :-- | :-- |
-| <div class="no-wrap">`setItem(itemKey, value[, options])`</div> | Insert a value into the cache under the `itemKey`. |
+| `setItem(itemKey, value[, options])` | Insert a value into the cache under the `itemKey`. |
 | `getItem(itemKey[, options])` | Retrieve data from the cache under the `itemKey`. |
 | `unsetItem(itemKey)` | Unset data in the cache under the `itemKey`.<br>This does not remove a cached ETag header associated with the cache item. |
 | `expireItem(itemKey)` | Unset a cached ETag associated with this cache item.<br>This does not remove data stored in the cache item. |

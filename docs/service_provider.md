@@ -37,9 +37,9 @@ angular
 | :-- | :-- |
 | [`defineCache(id[, config])`](#defineCache) | Define a cache with default or specified config (extends default). |
 | [`setDefaultCacheConfig(config)`](#setDefaultCacheConfig) | Define the default cache config. |
-| `getDefaultCacheConfig()` | Get default config. |
-| `defineCacheServiceAdapter(name, config)` | Define a [Cache Service Adapter](cache_service_adapters.md) for third-party cache support. |
-| `getCacheServiceAdapter(name)` | Get named [Cache Service Adapter](cache_service_adapters.md) config. |
+| [`getDefaultCacheConfig()`](#getDefaultCacheConfig) | Get default config. |
+| [`defineCacheServiceAdapter(name, config)`](#defineCacheServiceAdapter) | Define a [Cache Service Adapter](cache_service_adapters.md) for third-party cache support. |
+| [`getCacheServiceAdapter(name)`](#getCacheServiceAdapter) | Get named [Cache Service Adapter](cache_service_adapters.md) config. |
 
 ---
 
@@ -68,7 +68,6 @@ httpEtagProvider
   })
 ```
 
-
 ## setDefaultCacheConfig
 
 `setDefaultCacheConfig(config)`
@@ -92,3 +91,23 @@ Default configuration:
   cacheResponseData: true
 }
 ```
+
+## getDefaultCacheConfig
+
+`getDefaultCacheConfig()`
+
+Get the default configuration object.
+
+## defineCacheServiceAdapter
+
+`defineCacheServiceAdapter(serviceName, config)`
+
+Use this method to define adapters for third-party cache services.
+More information can be found in the [Cache Service Adapter](cache_service_adapters.md)
+documentation.
+
+## getCacheServiceAdapter
+
+`defineCacheServiceAdapter(serviceName)`
+
+Get the adapter configuration object for the specified service.
