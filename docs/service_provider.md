@@ -35,11 +35,11 @@ angular
 
 | Method | Details |
 | :-- | :-- |
-| [`defineCache(id[, config])`](#defineCache) | Define a cache with default or specified config (extends default). |
-| [`setDefaultCacheConfig(config)`](#setDefaultCacheConfig) | Define the default cache config. |
-| [`getDefaultCacheConfig()`](#getDefaultCacheConfig) | Get default config. |
-| [`defineCacheServiceAdapter(name, config)`](#defineCacheServiceAdapter) | Define a [Cache Service Adapter](cache_service_adapters.md) for third-party cache support. |
-| [`getCacheServiceAdapter(name)`](#getCacheServiceAdapter) | Get named [Cache Service Adapter](cache_service_adapters.md) config. |
+| [`defineCache(id[, config])`](#definecache) | Define a cache with default or specified config (extends default). |
+| [`setDefaultCacheConfig(config)`](#setdefaultcacheconfig) | Define the default cache config. |
+| [`getDefaultCacheConfig()`](#getdefaultcacheconfig) | Get default config. |
+| [`defineCacheServiceAdapter(name, config)`](#definecacheserviceadapter) | Define a [Cache Service Adapter](cache_service_adapters.md) for third-party cache support. |
+| [`getCacheServiceAdapter(name)`](#getcacheserviceadapter) | Get named [Cache Service Adapter](cache_service_adapters.md) config. |
 
 ---
 
@@ -55,7 +55,7 @@ angular
 Define a new cache with an ID and an optional configuration. Returns provider.
 If a configuration is specified, it will extend the default config.
 If no configuration is specified, the default configuration is used. The default
-can be set using [`setDefaultCacheConfig()`](#setDefaultCacheConfig).
+can be set using [`setDefaultCacheConfig()`](#setdefaultcacheconfig).
 
 **Example usage:**
 
