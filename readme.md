@@ -144,14 +144,15 @@ function requestHandler(data, status, headers, config, itemCache) {
 
   // itemCache is a cache object bound to the cache item associated with this request.
   itemCache.info()
-  // { deepCopy: false,
+  // { id: 'httpEtagCache',
+  //   itemKey: '/data',
+  //   deepCopy: false,
   //   cacheResponseData: true,
   //   cacheService: '$cacheFactory',
-  //   cacheOptions: { number: 25 },
-  //   id: 'httpEtagCache',
-  //   itemKey: '/data' }
+  //   cacheOptions: { number: 25 } }
 }
 ```
+
 Using a defined cache from the previous section and an automatically generated cache itemKey:
 
 ``` javascript
@@ -163,46 +164,38 @@ $http.get('/data', {
 
 function requestHandler(data, status, headers, config, itemCache) {
   itemCache.info()
-  // { deepCopy: false,
+  // { id: 'httpEtagCache',
+  //   itemKey: '/data',
+  //   deepCopy: false,
   //   cacheResponseData: true,
   //   cacheService: 'localStorage',
-  //   cacheOptions: { number: 25 },
-  //   id: 'httpEtagCache',
-  //   itemKey: '/data' }
+  //   cacheOptions: { number: 25 } }
 }
 ```
-
-#### etagCache Property
-
-The `etagCache` `$http` config property accepts the following value types:
-
-| Type | Details |
-| :-- | :-- |
-| `boolean` | If `true`, use default `cacheId` and `itemKey`. |
-| `string` | String representing the `cacheId` to be used. |
-| `object.<string>` | Object with `cacheId` property and optional `itemKey` property. See below. |
-| `function` | A function that returns one of the above value types. The current `$http` config is passed an argument. |
-
-Config object with optional `itemKey` property. If not specified, one will be generated based on the request URL/params.
+Using a defined cache and a specified key for the cache item:
 
 ``` javascript
-{
-  cacheId: 'sessionCache',
-  itemKey: 'specifiedKey' // Optional property
+$http.get('/data', {
+    etagCache: {
+      id: 'persistentCache',
+      itemKey: 'whatFineKeyYouHave'
+    }
+  })
+  .cached(requestHandler)
+  .success(requestHandler)
+
+function requestHandler(data, status, headers, config, itemCache) {
+  itemCache.info()
+  // { id: 'httpEtagCache',
+  //   itemKey: 'whatFineKeyYouHave',
+  //   deepCopy: false,
+  //   cacheResponseData: true,
+  //   cacheService: 'localStorage',
+  //   cacheOptions: { number: 25 } }
 }
 ```
 
-#### itemCache Object
-
-The `itemCache` object that is passed to `cached` and `success` callbacks has these methods:
-
-| Method | Details |
-| :-- | :-- |
-| `info()` | Return info about this cacheItem |
-| `set(value[, options])` | Update the cache with the passed value and optional options (if the cache service supports options) |
-| `get([options])` | Get the cache contents with optional options (if the cache service supports options) |
-| `unset()` | Remove cached data while preserving the cached ETag. |
-| `expire()` | Remove cached ETag while preserving the cached data. |
-| `remove()` | Clear the cached response data and ETag. |
+The `etagCache` property also accepts a function that returns on of the values
+demonstrated; a `boolean`, a `string`, or an `object`.
 
  _See more in the [$http Decorator] and [Service] documentation._
