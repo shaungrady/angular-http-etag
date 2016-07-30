@@ -213,10 +213,10 @@ it('should accept an object specifying desired cacheId', function () {
   $httpBackend.flush()
 
   $http.get('/1.json', { etagCache: cacheConfig })
-  .cached(function (data, status, headers, config, itemCache) {
-    var cacheInfo = itemCache.info()
-    cacheInfo.id.should.equal('testCache')
-  })
+    .cached(function (data, status, headers, config, itemCache) {
+      var cacheInfo = itemCache.info()
+      cacheInfo.id.should.equal('testCache')
+    })
   $httpBackend.flush()
 })
 
@@ -230,11 +230,11 @@ it('should accept an object specifying desired cacheId and itemKey', function ()
   $httpBackend.flush()
 
   $http.get('/1.json', { etagCache: cacheConfig })
-  .cached(function (data, status, headers, config, itemCache) {
-    var cacheInfo = itemCache.info()
-    cacheInfo.id.should.equal('testCache')
-    cacheInfo.itemKey.should.equal('testItemKey')
-  })
+    .cached(function (data, status, headers, config, itemCache) {
+      var cacheInfo = itemCache.info()
+      cacheInfo.id.should.equal('testCache')
+      cacheInfo.itemKey.should.equal('testItemKey')
+    })
   $httpBackend.flush()
 })
 
