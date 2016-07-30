@@ -1,4 +1,10 @@
-languages:
-  JavaScript: true
-exclude_paths:
-- "release/*"
+engines:
+  eslint:
+    enabled: true
+    channel: "eslint-2"
+    config:
+      config: .eslintrc.json
+
+ratings:
+  paths:
+  - "src/**/*.js"

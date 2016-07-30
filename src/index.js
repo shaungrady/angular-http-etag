@@ -1,23 +1,23 @@
-'use strict';
+'use strict'
 
-var angular     = require('angular');
-var objectKeys  = require('object-keys');
-var arrayMap    = require('array-map');
+var angular = require('angular')
 
-var provider    = require('./provider');
-var interceptor = require('./interceptor');
-var config      = require('./config');
-var run         = require('./run');
+var service = require('./service')
+var $httpDecorator = require('./httpDecorator')
+var $httpInterceptor = require('./httpInterceptor')
+var cacheServiceAdapters = require('./cacheServiceAdapters')
+
+var _$provide
 
 module.exports = angular
   .module('http-etag', [])
-  .value('polyfills', {
-    keys: objectKeys,
-    map: arrayMap
+  .provider('httpEtag', service)
+  .config(cacheServiceAdapters)
+  .config(['$provide', '$httpProvider', function ($provide, $httpProvider) {
+    _$provide = $provide
+    $httpProvider.interceptors.push($httpInterceptor)
+  }])
+  .run(function () {
+    _$provide.decorator('$http', $httpDecorator)
   })
-  .provider('httpEtag', provider)
-  .factory('httpEtagInterceptor', interceptor)
-  .config(config)
-  .run(run)
-
-  .name;
+  .name

@@ -1,17 +1,19 @@
 {
   "name": "angular-http-etag",
-  "version": "1.1.4",
+  "version": "2.0.0",
   "description": "Angular module allowing easy use of ETags",
   "homepage": "https://github.com/shaungrady/angular-http-etag#readme",
   "author": "Shaun Grady",
   "license": "MIT",
   "main": "./src",
   "scripts": {
+    "start": "mochify --watch test/",
+    "build": "npm run umd && npm run uglify",
     "umd": "browserify -e . -s angularHttpEtag -t [exposify --expose [ --angular=angular ] ] -p derequire/plugin > ./release/angular-http-etag.js",
-    "start": "mochify --watch",
-    "phantom": "mochify",
-    "coverage": "mochify --plugin [ mochify-istanbul --report lcov --dir './coverage' ]",
-    "test": "npm run phantom && npm run coverage"
+    "uglify": "cd ./release && uglifyjs -c -m --source-map angular-http-etag.min.map -- angular-http-etag.js > angular-http-etag.min.js",
+    "phantom": "mochify -R spec test/",
+    "coverage": "mochify --plugin [ mochify-istanbul --report lcov --dir './coverage' ] test/",
+    "test": "npm run phantom && npm run coverage && eslint ./"
   },
   "repository": {
     "type": "git",
@@ -20,38 +22,51 @@
   "keywords": [
     "angular",
     "$http",
-    "$cacheFactory",
     "etag",
     "cache",
+    "$cacheFactory",
+    "localStorage",
+    "sessionStorage",
+    "web storage",
+    "entity tag",
     "interceptor",
-    "decorator"
+    "decorator",
+    "If-None-Match"
   ],
   "bugs": {
     "url": "https://github.com/shaungrady/angular-http-etag/issues"
   },
   "dependencies": {
     "array-map": "^0.0.0",
+    "deepcopy": "^0.6.3",
     "object-keys": "^1.0.11"
   },
   "peerDependencies": {
     "angular": ">=1.2 <1.6"
   },
   "devDependencies": {
-    "angular": "~1.5.7",
-    "angular-mocks": "~1.5.7",
-    "browserify": "^13.0.1",
+    "angular": "~1.5.8",
+    "angular-mocks": "~1.5.8",
+    "browserify": "^13.1.0",
     "chai": "^3.5.0",
     "chai-spies": "^0.7.1",
     "codeclimate-test-reporter": "^0.3.3",
     "derequire": "^2.0.3",
+    "eslint": "^3.2.0",
+    "eslint-config-standard": "^5.3.5",
+    "eslint-plugin-promise": "^2.0.0",
+    "eslint-plugin-standard": "^2.0.0",
     "exposify": "^0.5.0",
     "mochify": "^2.18.1",
     "mochify-istanbul": "^2.4.1",
-    "phantomjs-prebuilt": "^2.1.7"
+    "phantomjs-prebuilt": "^2.1.9",
+    "uglify-js": "https://registry.npmjs.org/uglify-js/-/uglify-js-2.6.1.tgz"
   },
   "ignore": [
     "**/.*",
+    "release/*.min.*",
     "node_modules",
+    "docs",
     "coverage",
     "test"
   ]
