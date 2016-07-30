@@ -111,3 +111,7 @@ documentation.
 `defineCacheServiceAdapter(serviceName)`
 
 Get the adapter configuration object for the specified service.
+
+---
+
+ _Continue by reading the [$http Decorator] and [Service] documentation._

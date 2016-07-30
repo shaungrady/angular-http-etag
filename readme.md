@@ -1,4 +1,4 @@
-# Angular HTTP ETag Module
+# Angular HTTP ETag
 
 [![npm version](https://badge.fury.io/js/angular-http-etag.svg)](http://badge.fury.io/js/angular-http-etag)
 [![Build Status](https://travis-ci.org/shaungrady/angular-http-etag.svg?branch=master)](https://travis-ci.org/shaungrady/angular-http-etag)
@@ -7,7 +7,6 @@
 [![Dependency Status](https://david-dm.org/shaungrady/angular-http-etag.svg)](https://david-dm.org/shaungrady/angular-http-etag)
 [![devDependency Status](https://david-dm.org/shaungrady/angular-http-etag/dev-status.svg)](https://david-dm.org/shaungrady/angular-http-etag#info=devDependencies)
 [![JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
-
 
 ---
 
@@ -67,10 +66,10 @@ _Need more information on how ETags work? [Stack Overflow](http://stackoverflow.
 - [$http Decorator]
 - [Cache Service Adapters]
 
-[Service Provider]: /docs/service_provider.md
-[Service]: /docs/service.md
-[$http Decorator]: /docs/http_decorator.md
-[Cache Service Adapters]: /docs/cache_service_adapters.md
+[Service Provider]: https://github.com/shaungrady/angular-http-etag/blob/master/docs/service_provider.md
+[Service]: https://github.com/shaungrady/angular-http-etag/blob/master/docs/service.md
+[$http Decorator]: https://github.com/shaungrady/angular-http-etag/blob/master/docs/http_decorator.md
+[Cache Service Adapters]: https://github.com/shaungrady/angular-http-etag/blob/master/docs/cache_service_adapters.md
 
 ## Quick Guide
 
@@ -79,6 +78,8 @@ _Need more information on how ETags work? [Stack Overflow](http://stackoverflow.
 ``` bash
 $ npm install angular-http-etag
 ```
+
+Or download from [master/release](https://github.com/shaungrady/angular-http-etag/tree/master/release)
 
 ### Include Dependency
 
