@@ -9,11 +9,16 @@
   "keywords": [
     "angular",
     "$http",
-    "$cacheFactory",
     "etag",
     "cache",
+    "$cacheFactory",
+    "localStorage",
+    "sessionStorage",
+    "web storage",
+    "entity tag",
     "interceptor",
-    "decorator"
+    "decorator",
+    "If-None-Match"
   ],
   "homepage": "https://github.com/shaungrady/angular-http-etag",
   "moduleType": [
@@ -26,6 +31,7 @@
     "**/.*",
     "node_modules",
     "bower_components",
+    "docs",
     "test",
     "coverage"
   ],

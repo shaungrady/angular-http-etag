@@ -7,8 +7,10 @@
   "license": "MIT",
   "main": "./src",
   "scripts": {
-    "umd": "browserify -e . -s angularHttpEtag -t [exposify --expose [ --angular=angular ] ] -p derequire/plugin > ./release/angular-http-etag.js",
     "start": "mochify --watch test/",
+    "build": "npm run umd && npm run uglify",
+    "umd": "browserify -e . -s angularHttpEtag -t [exposify --expose [ --angular=angular ] ] -p derequire/plugin > ./release/angular-http-etag.js",
+    "uglify": "cd ./release && uglifyjs -c -m --source-map angular-http-etag.min.map -- angular-http-etag.js > angular-http-etag.min.js",
     "phantom": "mochify -R spec test/",
     "coverage": "mochify --plugin [ mochify-istanbul --report lcov --dir './coverage' ] test/",
     "test": "npm run phantom && npm run coverage && eslint ./"
@@ -20,11 +22,16 @@
   "keywords": [
     "angular",
     "$http",
-    "$cacheFactory",
     "etag",
     "cache",
+    "$cacheFactory",
+    "localStorage",
+    "sessionStorage",
+    "web storage",
+    "entity tag",
     "interceptor",
-    "decorator"
+    "decorator",
+    "If-None-Match"
   ],
   "bugs": {
     "url": "https://github.com/shaungrady/angular-http-etag/issues"
@@ -52,10 +59,12 @@
     "exposify": "^0.5.0",
     "mochify": "^2.18.1",
     "mochify-istanbul": "^2.4.1",
-    "phantomjs-prebuilt": "^2.1.7"
+    "phantomjs-prebuilt": "^2.1.7",
+    "uglify-js": "https://registry.npmjs.org/uglify-js/-/uglify-js-2.6.1.tgz"
   },
   "ignore": [
     "**/.*",
+    "release/*.min.js",
     "node_modules",
     "docs",
     "coverage",

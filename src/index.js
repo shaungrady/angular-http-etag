@@ -2,12 +2,12 @@
 
 var angular = require('angular')
 
-var _$provide
-
 var service = require('./service')
 var $httpDecorator = require('./httpDecorator')
 var $httpInterceptor = require('./httpInterceptor')
 var cacheServiceAdapters = require('./cacheServiceAdapters')
+
+var _$provide
 
 module.exports = angular
   .module('http-etag', [])

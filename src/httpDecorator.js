@@ -58,8 +58,8 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
     if (itemCache) {
       var onSuccess = httpPromise.success
       httpPromise.success = function (callback) {
-        var partialCallback = partial(callback, undefined, undefined, undefined, undefined, itemCache)
-        return onSuccess(partialCallback)
+        var partializedCallback = partial(callback, undefined, undefined, undefined, undefined, itemCache)
+        return onSuccess(partializedCallback)
       }
     }
 
