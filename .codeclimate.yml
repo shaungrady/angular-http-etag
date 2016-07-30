@@ -8,3 +8,10 @@ engines:
 ratings:
   paths:
   - "src/**/*.js"
+
+ecmaFeatures:
+  modules: true
+
+env:
+  amd: true
+  browser: true
