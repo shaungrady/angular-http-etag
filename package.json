@@ -64,7 +64,7 @@
   },
   "ignore": [
     "**/.*",
-    "release/*.min.js",
+    "release/*.min.*",
     "node_modules",
     "docs",
     "coverage",
