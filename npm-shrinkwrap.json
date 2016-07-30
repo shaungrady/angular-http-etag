@@ -3038,9 +3038,9 @@
       "resolved": "https://registry.npmjs.org/typedarray/-/typedarray-0.0.6.tgz"
     },
     "uglify-js": {
-      "version": "2.6.1",
-      "from": "https://registry.npmjs.org/uglify-js/-/uglify-js-2.6.1.tgz",
-      "resolved": "https://registry.npmjs.org/uglify-js/-/uglify-js-2.6.1.tgz",
+      "version": "2.7.0",
+      "from": "uglify-js@latest",
+      "resolved": "https://registry.npmjs.org/uglify-js/-/uglify-js-2.7.0.tgz",
       "dependencies": {
         "async": {
           "version": "0.2.10",
