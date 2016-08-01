@@ -1839,17 +1839,10 @@ function isnan (val) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"base64-js":2,"ieee754":9,"isarray":4}],4:[function(_dereq_,module,exports){
-var toString = {}.toString;
-
-module.exports = Array.isArray || function (arr) {
-  return toString.call(arr) == '[object Array]';
-};
-
-},{}],5:[function(_dereq_,module,exports){
+},{"base64-js":2,"ieee754":8,"isarray":9}],4:[function(_dereq_,module,exports){
 module.exports = _dereq_('./lib');
 
-},{"./lib":7}],6:[function(_dereq_,module,exports){
+},{"./lib":6}],5:[function(_dereq_,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -1995,7 +1988,7 @@ exports.copy = copy;
 exports.copyCollection = copyCollection;
 exports.copyValue = copyValue;
 }).call(this,_dereq_("buffer").Buffer)
-},{"./polyfill":8,"buffer":3}],7:[function(_dereq_,module,exports){
+},{"./polyfill":7,"buffer":3}],6:[function(_dereq_,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2088,7 +2081,7 @@ function recursiveCopy(target, customizer, clone, visited, reference) {
 
 exports['default'] = deepcopy;
 module.exports = exports['default'];
-},{"./copy":6,"./polyfill":8}],8:[function(_dereq_,module,exports){
+},{"./copy":5,"./polyfill":7}],7:[function(_dereq_,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -2165,7 +2158,7 @@ exports.getSymbols = getSymbols;
 exports.indexOf = indexOf;
 exports.isBuffer = isBuffer;
 }).call(this,_dereq_("buffer").Buffer)
-},{"buffer":3}],9:[function(_dereq_,module,exports){
+},{"buffer":3}],8:[function(_dereq_,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = nBytes * 8 - mLen - 1
@@ -2250,6 +2243,13 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
   buffer[offset + i - d] |= s * 128
 }
+
+},{}],9:[function(_dereq_,module,exports){
+var toString = {}.toString;
+
+module.exports = Array.isArray || function (arr) {
+  return toString.call(arr) == '[object Array]';
+};
 
 },{}],10:[function(_dereq_,module,exports){
 'use strict';
@@ -2534,13 +2534,21 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
   ]
 
   function $httpDecorator (httpConfig) {
-    var isCachable = httpConfig.etagCache && cachableHttpMethods.indexOf(httpConfig.method) >= 0
+    var hasConfig = !!httpConfig.etagCache
+    var isCacheableMethod = cachableHttpMethods.indexOf(httpConfig.method) >= 0
+    var isCachable = hasConfig && isCacheableMethod
     var httpPromise
+
+    if (hasConfig && !isCacheableMethod && console && console.warn) {
+      console.warn('Cannot cache HTTP ' + httpConfig.method + ' requests')
+    }
 
     if (isCachable) {
       var etagCacheConfig = processHttpConfigEtagValue(httpConfig)
       if (etagCacheConfig) {
         var itemCache = httpEtag.getItemCache(etagCacheConfig.id, etagCacheConfig.itemKey)
+        if (!itemCache) throw new Error('No defined ETag caches match specified cache ID')
+
         var cacheInfo = itemCache.info()
         var cachedData = itemCache.get()
         var cachedEtag = cachedData && cachedData.etagHeader
@@ -2920,7 +2928,7 @@ function httpEtagProvider () {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"deepcopy":5}],16:[function(_dereq_,module,exports){
+},{"deepcopy":4}],16:[function(_dereq_,module,exports){
 (function (global){
 'use strict'
 
