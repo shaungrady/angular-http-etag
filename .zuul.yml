@@ -12,7 +12,7 @@ browsers:
   - name: microsoftedge
     version: latest
   - name: opera
-    version: -1..latest
+    version: latest
   - name: android
     version: -1..latest
   - name: iphone
