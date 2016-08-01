@@ -38,6 +38,8 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
       var etagCacheConfig = processHttpConfigEtagValue(httpConfig)
       if (etagCacheConfig) {
         var itemCache = httpEtag.getItemCache(etagCacheConfig.id, etagCacheConfig.itemKey)
+        if (!itemCache) throw new Error('No defined ETag caches match specified cache ID')
+
         var cacheInfo = itemCache.info()
         var cachedData = itemCache.get()
         var cachedEtag = cachedData && cachedData.etagHeader

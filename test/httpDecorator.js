@@ -298,6 +298,15 @@ describe('HTTP Decorator', function () {
     successSpy.should.have.been.called
   })
 
+  it('should throw an error when specifying a bad cache ID', function () {
+    function badCacheIdRequest () {
+      $http.get('/1.json', { etagCache: 'Undefined Cache' })
+      $httpBackend.flush()
+    }
+
+    badCacheIdRequest.should.throw(Error)
+  })
+
   it('should not cache when etagCache property value is false', function () {
     $http.get('/1.json', { etagCache: false })
     $httpBackend.flush()
