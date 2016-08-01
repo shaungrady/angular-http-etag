@@ -25,8 +25,14 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
   ]
 
   function $httpDecorator (httpConfig) {
-    var isCachable = httpConfig.etagCache && cachableHttpMethods.indexOf(httpConfig.method) >= 0
+    var hasConfig = !!httpConfig.etagCache
+    var isCacheableMethod = cachableHttpMethods.indexOf(httpConfig.method) >= 0
+    var isCachable = hasConfig && isCacheableMethod
     var httpPromise
+
+    if (hasConfig && !isCacheableMethod && console && console.warn) {
+      console.warn('Cannot cache HTTP ' + httpConfig.method + ' requests')
+    }
 
     if (isCachable) {
       var etagCacheConfig = processHttpConfigEtagValue(httpConfig)
