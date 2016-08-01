@@ -13,8 +13,8 @@
     "uglify": "cd ./release && uglifyjs -c -m --source-map angular-http-etag.min.map -- angular-http-etag.js > angular-http-etag.min.js",
     "phantom": "mochify -R spec test/",
     "coverage": "mochify --plugin [ mochify-istanbul --report lcov --dir './coverage' ] test/",
-    "test": "npm run phantom && npm run coverage && eslint ./ && npm run saucelabs",
-    "saucelabs": "zuul ./test/*.js"
+    "test": "npm run phantom && npm run coverage && eslint ./",
+    "saucelabs-test": "zuul ./test/*.js"
   },
   "repository": {
     "type": "git",
