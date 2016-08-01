@@ -122,11 +122,13 @@ angular.module('myApp', [
 })
 ```
 
+If you so desire, you can define your own caches. The default cache uses `$cacheFactory`
+and is limited to 25 cache items (Least Recently Used algorithm).
+
 Define the caches you'd like to use by using `defineCache(cacheId[, config])`, passing a cache ID
 followed by the cache configuration. The configuration you pass will extend the
-default configuration, which can be set using the `setDefaultCacheConfig(config)` method. If you don't pass a config, a new cache will be defined using the default config.
-
-When making `$http` requests, if you don't specify a `cacheId` in the request configuration, a default cache ID of `httpEtagCache` will be used.
+default configuration, which can be set using the `setDefaultCacheConfig(config)`
+method. If you don't pass a config, a new cache will be defined using the default config.
 
  _See more in the [Service Provider] documentation._
 
@@ -202,3 +204,13 @@ The `etagCache` property also accepts a function that returns on of the values
 demonstrated; a `boolean`, a `string`, or an `object`.
 
  _See more in the [$http Decorator] and [Service] documentation._
+
+## Contributing
+
+Write an issue. Then, possibly, hopefully...
+
+1. Fork the repo.
+2. Make a branch.
+3. Write the code.
+3. Write the tests.
+3. Open a pull request.
