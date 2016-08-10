@@ -2523,15 +2523,6 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
     'GET',
     'JSONP'
   ]
-  var $httpShortcutMethods = [
-    'get',
-    'head',
-    'post',
-    'put',
-    'delete',
-    'jsonp',
-    'patch'
-  ]
 
   function $httpDecorator (httpConfig) {
     var hasConfig = !!httpConfig.etagCache
@@ -2583,9 +2574,9 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
     return httpPromise
   }
 
-  // Decorate the shortcut methods, too
-  angular.forEach($httpShortcutMethods, function (method) {
-    var httpMethod = method.toUpperCase()
+  // Decorate the cachable shortcut methods, too
+  angular.forEach(cachableHttpMethods, function (httpMethod) {
+    var method = httpMethod.toLowerCase()
     var isCachable = cachableHttpMethods.indexOf(httpMethod) >= 0
     var shortcutMethod
 
@@ -2601,6 +2592,11 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
       }
     }
     $httpDecorator[method] = shortcutMethod
+  })
+
+  // Copy over all other properties and methods
+  angular.forEach($http, function (value, key) {
+    if (!$httpDecorator[key]) $httpDecorator[key] = value
   })
 
   /**
