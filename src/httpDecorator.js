@@ -65,7 +65,7 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
     return httpPromise
   }
 
-  // Decorate the cacable shortcut methods, too
+  // Decorate the cachable shortcut methods, too
   angular.forEach(cachableHttpMethods, function (httpMethod) {
     var method = httpMethod.toLowerCase()
     var isCachable = cachableHttpMethods.indexOf(httpMethod) >= 0
