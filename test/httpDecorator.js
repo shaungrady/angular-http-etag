@@ -84,6 +84,27 @@ describe('HTTP Decorator', function () {
     })
   })
 
+  it('should have same properties/methods as undecorated $http service', function () {
+    var properties = [
+      ['delete', 'function'],
+      ['get', 'function'],
+      ['head', 'function'],
+      ['jsonp', 'function'],
+      ['patch', 'function'],
+      ['post', 'function'],
+      ['put', 'function'],
+      ['defaults', 'object'],
+      ['pendingRequests', 'object']
+    ]
+
+    angular.forEach(properties, function (tuple) {
+      var method = tuple[0]
+      var expectedType = tuple[1]
+      var type = typeof $http[method]
+      type.should.equal(expectedType)
+    })
+  })
+
   it('should cache response and ETag data', function () {
     $http.get('/1.json', { etagCache: true })
       .cached(cachedSpy)
