@@ -116,11 +116,30 @@ describe('HTTP Decorator', function () {
 
     $http.get('/1.json', { etagCache: true })
       .cached(cachedSpy)
+      .success(successSpy)
       .error(errorSpy)
     $httpBackend.flush()
 
     cachedSpy.should.have.been.called.once
+    successSpy.should.have.been.called.once
     errorSpy.should.have.been.called.once
+  })
+
+  it('should not let cached ETag get wiped by modifying cache data', function () {
+    $http.get('/1.json', { etagCache: true })
+    $httpBackend.flush()
+
+    $http.get('/1.json', { etagCache: true })
+      .cached(function (data, status, headers, config, itemCache) {
+        itemCache.unset()
+      })
+    $httpBackend.flush()
+
+    $http.get('/1.json', { etagCache: true })
+      .cached(cachedSpy)
+    $httpBackend.flush()
+
+    cachedSpy.should.have.been.called.once
   })
 
   it('should use a different itemKey for requests with params', function () {
