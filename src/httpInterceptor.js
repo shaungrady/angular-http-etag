@@ -15,7 +15,7 @@ function httpEtagInterceptorFactory () {
       if (etag) {
         cacheData.etagHeader = etag
         if (cacheResponseData) cacheData.responseData = response.data
-        itemCache.set(cacheData)
+        itemCache.$set(cacheData)
       }
 
       delete response.config.$$_itemCache

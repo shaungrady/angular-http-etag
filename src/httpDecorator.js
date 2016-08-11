@@ -32,9 +32,9 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
         if (!itemCache) throw new Error('No defined ETag caches match specified cache ID')
 
         var cacheInfo = itemCache.info()
-        var cachedData = itemCache.get()
-        var cachedEtag = cachedData && cachedData.etagHeader
-        var cachedResponse = cachedEtag && cachedData.responseData
+        var rawCacheData = itemCache.$get()
+        var cachedEtag = rawCacheData && rawCacheData.etagHeader
+        var cachedResponse = cachedEtag && rawCacheData.responseData
 
         // Allow easy access to cache in interceptor
         httpConfig.$$_itemCache = itemCache
@@ -50,7 +50,7 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
     httpPromise = $http.apply($http, arguments)
 
     httpPromise.cached = function (callback) {
-      if (isCachable && cachedData && cacheInfo.cacheResponseData) callback(cachedResponse, 'cached', undefined, httpConfig, itemCache)
+      if (isCachable && rawCacheData && cacheInfo.cacheResponseData) callback(cachedResponse, 'cached', undefined, httpConfig, itemCache)
       return httpPromise
     }
 
