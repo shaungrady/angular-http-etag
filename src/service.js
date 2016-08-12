@@ -174,6 +174,7 @@ function httpEtagProvider () {
       adaptedCache.info = function adaptedCacheInfo () {
         return cacheDefinitions[cacheId]
       }
+      adaptedCache.isCache = true
     })
 
     httpEtagService.info = function httpEtagServiceInfo () {
@@ -209,6 +210,8 @@ function httpEtagProvider () {
         itemCacheInfo.itemKey = itemKey
         return itemCacheInfo
       }
+
+      itemCache.isItemCache = true
 
       return itemCache
     }

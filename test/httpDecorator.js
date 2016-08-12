@@ -8,7 +8,7 @@ var should = chai.should()
 var spy = chai.spy
 
 var httpEtagProvider
-// var httpEtag
+var httpEtag
 var $http
 var $httpBackend
 
@@ -50,8 +50,7 @@ describe('HTTP Decorator', function () {
     angular.mock.module(require('../src/'))
     angular.mock.module('test')
     angular.mock.inject(function ($injector) {
-      $injector.get('httpEtag')
-      // httpEtag = $injector.get('httpEtag')
+      httpEtag = $injector.get('httpEtag')
       $http = $injector.get('$http')
       $httpBackend = $injector.get('$httpBackend')
 
@@ -272,6 +271,36 @@ describe('HTTP Decorator', function () {
     $httpBackend.flush()
 
     $http.get('/1.json', { etagCache: cacheConfig })
+      .cached(function (data, status, headers, config, itemCache) {
+        var cacheInfo = itemCache.info()
+        cacheInfo.id.should.equal('testCache')
+        cacheInfo.itemKey.should.equal('testItemKey')
+      })
+    $httpBackend.flush()
+  })
+
+  it('should accept a cache object', function () {
+    var cache = httpEtag.getCache('testCache')
+
+    $http.get('/1.json', { etagCache: cache })
+    $httpBackend.flush()
+
+    $http.get('/1.json', { etagCache: cache })
+      .cached(function (data, status, headers, config, itemCache) {
+        var cacheInfo = itemCache.info()
+        cacheInfo.id.should.equal('testCache')
+        cacheInfo.itemKey.should.equal('/1.json')
+      })
+    $httpBackend.flush()
+  })
+
+  it('should accept an itemCache object', function () {
+    var itemCache = httpEtag.getItemCache('testCache', 'testItemKey')
+
+    $http.get('/1.json', { etagCache: itemCache })
+    $httpBackend.flush()
+
+    $http.get('/1.json', { etagCache: itemCache })
       .cached(function (data, status, headers, config, itemCache) {
         var cacheInfo = itemCache.info()
         cacheInfo.id.should.equal('testCache')
