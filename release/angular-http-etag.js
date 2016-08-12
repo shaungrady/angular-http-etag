@@ -2614,9 +2614,23 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
       etagValueType = typeof etagValue
     }
 
+    // Plain, cache, or itemCache objects
     if (etagValueType === 'object') {
-      etagCacheConfig.id = etagValue.id
-      etagCacheConfig.itemKey = etagValue.itemKey || generateCacheItemKey(httpConfig)
+      var id, itemKey
+
+      if (etagValue.isCache) {
+        id = etagValue.info().id
+        itemKey = generateCacheItemKey(httpConfig)
+      } else if (etagValue.isItemCache) {
+        id = etagValue.info().id
+        itemKey = etagValue.info().itemKey
+      } else {
+        id = etagValue.id
+        itemKey = etagValue.itemKey || generateCacheItemKey(httpConfig)
+      }
+
+      etagCacheConfig.id = id
+      etagCacheConfig.itemKey = itemKey
     } else if (etagValueType === 'string') {
       etagCacheConfig.id = etagValue
       etagCacheConfig.itemKey = generateCacheItemKey(httpConfig)
@@ -2874,6 +2888,7 @@ function httpEtagProvider () {
       adaptedCache.info = function adaptedCacheInfo () {
         return cacheDefinitions[cacheId]
       }
+      adaptedCache.isCache = true
     })
 
     httpEtagService.info = function httpEtagServiceInfo () {
@@ -2909,6 +2924,8 @@ function httpEtagProvider () {
         itemCacheInfo.itemKey = itemKey
         return itemCacheInfo
       }
+
+      itemCache.isItemCache = true
 
       return itemCache
     }
