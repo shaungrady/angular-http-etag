@@ -52,6 +52,7 @@ On `setItem` and `getItem` options: Some cache services may allow for additional
 
 | Method | Details |
 | :-- | :-- |
+| `info()` | Returns an object with information about the cache configuration, including cache ID. |
 | `setItem(itemKey, value[, options])` | Insert a value into the cache under the `itemKey`. |
 | `getItem(itemKey[, options])` | Retrieve data from the cache under the `itemKey`. |
 | `unsetItem(itemKey)` | Unset data in the cache under the `itemKey`.<br>This does not remove a cached ETag header associated with the cache item. |
@@ -67,6 +68,7 @@ When using an ETag cache with the `$http` service, an `itemCache` object is pass
 
 | Method | Details |
 | :-- | :-- |
+| `info()` | Returns an object with information about the cache configuration, including cache ID and cache item key. |
 | `set(value[, options])` | Insert a value into the cache item. |
 | `get([options])` | Retrieve data from the cache item. |
 | `unset()` | Unset data in the cache item.<br>This does not remove a cached ETag header associated with the cache item. |
