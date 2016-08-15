@@ -11,11 +11,11 @@ Manipulate caches and cache items defined through the [Service Provider](service
   // Get the default cache
   var cache = httpEtag.getCache()
   cache.info()
-  // { deepCopy: false,
+  // { id: 'httpEtagCache',
+  //   deepCopy: false,
   //   cacheResponseData: true,
   //   cacheService: '$cacheFactory',
-  //   cacheOptions: { number: 25 },
-  //   id: 'httpEtagCache' }
+  //   cacheOptions: { number: 25 } }
 
   cache.setItem('myItemKey', [{ hello: 'world' }])
   cache.getItem('myItemKey') //> [{ hello: 'world' }]
@@ -23,12 +23,12 @@ Manipulate caches and cache items defined through the [Service Provider](service
   // Get itemKey-bound itemCache object
   var itemCache = cache.getItemCache('myItemKey') // or httpEtag.getItemCache('httpEtagCache', 'myItemKey')
   itemCache.info()
-  // { deepCopy: false,
+  // { id: 'httpEtagCache',
+  //   itemKey: 'myItemKey',
+  //   deepCopy: false,
   //   cacheResponseData: true,
   //   cacheService: '$cacheFactory',
-  //   cacheOptions: { number: 25 },
-  //   id: 'httpEtagCache',
-  //   itemKey: 'myItemKey' }
+  //   cacheOptions: { number: 25 } }
 
   itemCache.get() //> [{ hello: 'world' }]
   itemCache.unset()
