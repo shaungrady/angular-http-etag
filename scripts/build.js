@@ -20,10 +20,10 @@ var bundleHeader =
  * ${packageData.homepage}
  * Module: Universal Module Definition
  * License: ${packageData.license}
- */\n\n`
+ */\n`
 
 var writeSteam = fs.createWriteStream(bundleFile, 'utf8')
-writeSteam.write(bundleHeader)
+writeSteam.write(bundleHeader + '\n')
 
 // UMD Bundle
 browserify({ standalone: 'angularHttpEtag' })
@@ -39,7 +39,7 @@ browserify({ standalone: 'angularHttpEtag' })
     var result = uglifyJs
       .minify([bundleFile], {
         output: {
-          preamble: bundleHeader.substr(0, bundleHeader.length - 1)
+          preamble: bundleHeader
         },
         outSourceMap: 'angular-http-etag.min.map'
       })
