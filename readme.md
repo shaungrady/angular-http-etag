@@ -59,7 +59,7 @@ angular
   })
 ```
 
-_Need more information on how ETags work? [Stack Overflow](http://stackoverflow.com/questions/499966/etag-vs-header-expires) has your back._
+_Need more information on how ETags work? [Read this.](http://bitworking.org/news/ETags__This_stuff_matters)._
 
 ## Detailed Documentation
 
