@@ -12,7 +12,7 @@ Tested: IE 9+; Edge 13; Chrome 29, 50+; Firefox 46+; Safari 7+; iOS 9.2+; Androi
 
 ---
 
-Easy ETag-based caching for `$http` service requests! Increase responsiveness, decrease bandwidth.
+Easy ETag-based caching for `$http` service requests! Increase responsiveness, decrease bandwidth usage.
 
 * Caches ETag headers and sends them back to the server in the `If-None-Match` header.
 * Caches response data with flexible cache configuration.
