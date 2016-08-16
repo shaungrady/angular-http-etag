@@ -37,10 +37,19 @@ describe('Service', function () {
           .defineCache('$cacheFactoryTestCache', {
             cacheService: '$cacheFactory'
           })
+          .defineCache('$cacheFactoryTestCacheTwo', {
+            cacheService: '$cacheFactory'
+          })
           .defineCache('localStorageTestCache', {
             cacheService: 'localStorage'
           })
+          .defineCache('localStorageTestCacheTwo', {
+            cacheService: 'localStorage'
+          })
           .defineCache('sessionStorageTestCache', {
+            cacheService: 'sessionStorage'
+          })
+          .defineCache('sessionStorageTestCacheTwo', {
             cacheService: 'sessionStorage'
           })
 
@@ -190,6 +199,21 @@ describe('Service', function () {
           cache.removeAllItems()
           should.not.exist(cache.getItem('test1'))
           should.not.exist(cache.getItem('test2'))
+        })
+      })
+    })
+
+    describe('`removeAllItems` should not remove data from other caches', function () {
+      cacheIds.forEach(function (id) {
+        it('(using ' + id.replace('TestCache', '') + ')', function () {
+          var cache = httpEtag.getCache(id)
+          var otherCache = httpEtag.getCache(id + 'Two')
+
+          cache.setItem('hello', testValue)
+          otherCache.setItem('hello', testValue)
+
+          cache.removeAllItems()
+          should.exist(otherCache.getItem('hello'))
         })
       })
     })
