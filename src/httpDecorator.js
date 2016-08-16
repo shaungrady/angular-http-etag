@@ -49,14 +49,14 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
 
     httpPromise = $http.apply($http, arguments)
 
-    httpPromise.cached = function (callback) {
+    httpPromise.cached = function httpEtagPromiseCached (callback) {
       if (isCachable && rawCacheData && cacheInfo.cacheResponseData) callback(cachedResponse, 'cached', undefined, httpConfig, itemCache)
       return httpPromise
     }
 
     if (itemCache) {
       var onSuccess = httpPromise.success
-      httpPromise.success = function (callback) {
+      httpPromise.success = function httpEtagPromiseSuccess (callback) {
         var partializedCallback = partial(callback, undefined, undefined, undefined, undefined, itemCache)
         return onSuccess(partializedCallback)
       }
@@ -86,7 +86,7 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
   })
 
   // Copy over all other properties and methods
-  angular.forEach($http, function (value, key) {
+  angular.forEach($http, function copyHttpPropertyToDectorator (value, key) {
     if (!$httpDecorator[key]) $httpDecorator[key] = value
   })
 

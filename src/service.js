@@ -85,7 +85,7 @@ function httpEtagProvider () {
    * .getItemCache(cacheId, itemKey)
    */
 
-  httpEtagProvider.$get = ['$injector', function ($injector) {
+  httpEtagProvider.$get = ['$injector', function httpEtagFactory ($injector) {
     var httpEtagService = {}
 
     var services = {}
@@ -97,7 +97,7 @@ function httpEtagProvider () {
     if (!cacheDefinitions[defaultCacheId]) httpEtagProvider.defineCache(defaultCacheId)
 
     // Find/inject cache service and create adapted versions
-    angular.forEach(cacheAdapters, function (adapter, serviceName) {
+    angular.forEach(cacheAdapters, function adaptCacheService (adapter, serviceName) {
       var service = services[serviceName] = window[serviceName] || $injector.get(serviceName)
       var adaptedService = adaptedServices[serviceName] = {}
 
@@ -107,7 +107,7 @@ function httpEtagProvider () {
     })
 
     // Instantiate caches and create adapted versions
-    angular.forEach(cacheDefinitions, function (config, cacheId) {
+    angular.forEach(cacheDefinitions, function adaptCache (config, cacheId) {
       adaptedServices[config.cacheService].createCache(cacheId, config)
       var cache = caches[cacheId] = adaptedServices[config.cacheService].getCache(cacheId)
       var adaptedCache = adaptedCaches[cacheId] = {}
@@ -201,7 +201,7 @@ function httpEtagProvider () {
         ['remove', 'removeItem']
       ]
 
-      angular.forEach(methodMappings, function (methods) {
+      angular.forEach(methodMappings, function mapCacheMethdodsToItemCache (methods) {
         itemCache[methods[0]] = angular.bind({}, cache[methods[1]], itemKey)
       })
 

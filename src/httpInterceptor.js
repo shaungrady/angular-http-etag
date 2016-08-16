@@ -24,5 +24,7 @@ function httpEtagInterceptorFactory () {
     return response
   }
 
-  return { response: responseInterceptor }
+  return {
+    response: responseInterceptor
+  }
 }

@@ -14,22 +14,22 @@ function cacheAdaptersConfig (httpEtagProvider) {
         storesDeepCopies: false
       },
       methods: {
-        createCache: function ($cacheFactory, cacheId, options) {
+        createCache: function createCache ($cacheFactory, cacheId, options) {
           $cacheFactory(cacheId, options)
         },
-        getCache: function ($cacheFactory, cacheId) {
+        getCache: function getCache ($cacheFactory, cacheId) {
           return $cacheFactory.get(cacheId)
         },
-        setItem: function (cache, itemKey, value) {
+        setItem: function setItem (cache, itemKey, value) {
           cache.put(itemKey, value)
         },
-        getItem: function (cache, itemKey) {
+        getItem: function getItem (cache, itemKey) {
           return cache.get(itemKey)
         },
-        removeItem: function (cache, itemKey) {
+        removeItem: function removeItem (cache, itemKey) {
           cache.remove(itemKey)
         },
-        removeAllItems: function (cache, itemKey) {
+        removeAllItems: function removeAllItems (cache, itemKey) {
           cache.removeAll()
         }
       }
@@ -41,22 +41,22 @@ function cacheAdaptersConfig (httpEtagProvider) {
       },
       methods: {
         createCache: angular.noop,
-        getCache: function (localStorage, cacheId) {
+        getCache: function getCache (localStorage, cacheId) {
           return cacheId
         },
-        setItem: function (cacheId, itemKey, value) {
+        setItem: function setItem (cacheId, itemKey, value) {
           itemKey = cacheId + ':' + itemKey
           localStorage.setItem(itemKey, JSON.stringify(value))
         },
-        getItem: function (cacheId, itemKey) {
+        getItem: function getItem (cacheId, itemKey) {
           itemKey = cacheId + ':' + itemKey
           return JSON.parse(localStorage.getItem(itemKey))
         },
-        removeItem: function (cacheId, itemKey) {
+        removeItem: function removeItem (cacheId, itemKey) {
           itemKey = cacheId + ':' + itemKey
           localStorage.removeItem(itemKey)
         },
-        removeAllItems: function (cacheId, itemKey) {
+        removeAllItems: function removeAllItems (cacheId, itemKey) {
           var keyPrefix = cacheId + ':'
           var keyPrefixLen = keyPrefix.length
 
@@ -75,22 +75,22 @@ function cacheAdaptersConfig (httpEtagProvider) {
       },
       methods: {
         createCache: angular.noop,
-        getCache: function (sessionStorage, cacheId) {
+        getCache: function getCache (sessionStorage, cacheId) {
           return cacheId
         },
-        setItem: function (cacheId, itemKey, value) {
+        setItem: function setItem (cacheId, itemKey, value) {
           itemKey = cacheId + ':' + itemKey
           sessionStorage.setItem(itemKey, JSON.stringify(value))
         },
-        getItem: function (cacheId, itemKey) {
+        getItem: function getItem (cacheId, itemKey) {
           itemKey = cacheId + ':' + itemKey
           return JSON.parse(sessionStorage.getItem(itemKey))
         },
-        removeItem: function (cacheId, itemKey) {
+        removeItem: function removeItem (cacheId, itemKey) {
           itemKey = cacheId + ':' + itemKey
           sessionStorage.removeItem(itemKey)
         },
-        removeAllItems: function (cacheId, itemKey) {
+        removeAllItems: function removeAllItems (cacheId, itemKey) {
           var keyPrefix = cacheId + ':'
           var keyPrefixLen = keyPrefix.length
 

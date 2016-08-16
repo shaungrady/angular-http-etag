@@ -13,11 +13,11 @@ module.exports = angular
   .module('http-etag', [])
   .provider('httpEtag', service)
   .config(cacheServiceAdapters)
-  .config(['$provide', '$httpProvider', function ($provide, $httpProvider) {
+  .config(['$provide', '$httpProvider', function addHttpEtagInterceptor ($provide, $httpProvider) {
     _$provide = $provide
     $httpProvider.interceptors.push($httpInterceptor)
   }])
-  .run(function () {
+  .run(function decorateHttpService () {
     _$provide.decorator('$http', $httpDecorator)
   })
   .name
