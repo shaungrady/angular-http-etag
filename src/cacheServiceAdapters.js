@@ -41,7 +41,7 @@ function cacheAdaptersConfig (httpEtagProvider) {
       },
       methods: {
         createCache: angular.noop,
-        getCache: function (undef, cacheId) {
+        getCache: function (localStorage, cacheId) {
           return cacheId
         },
         setItem: function (cacheId, itemKey, value) {
@@ -75,7 +75,7 @@ function cacheAdaptersConfig (httpEtagProvider) {
       },
       methods: {
         createCache: angular.noop,
-        getCache: function (undef, cacheId) {
+        getCache: function (sessionStorage, cacheId) {
           return cacheId
         },
         setItem: function (cacheId, itemKey, value) {
