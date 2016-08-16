@@ -55,6 +55,7 @@ The `etagCache` `$http` config property accepts the following value types:
 | `boolean` | If `true`, use default `cacheId` and `itemKey`. Or `false` to disable caching. |
 | `string` | String representing the `cacheId` to be used. Default used if string is empty. |
 | `object.<string>` | Object with `cacheId` property and optional `itemKey` property. See below. |
+| `cache` | A `cache` or `itemCache` object. If a `cache` object, the default `itemKey` will be used.  |
 | `function` | A function that returns one of the above value types. The current `$http` config is passed an argument. |
 
 Config object with optional `itemKey` property. If not specified, one will be generated based on the request URL/params.
