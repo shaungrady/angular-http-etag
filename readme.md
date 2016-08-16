@@ -24,7 +24,7 @@ Easy ETag-based caching for `$http` service requests!
 ``` javascript
 angular
   .module('myApp', [
-    'angular-http-etag'
+    'http-etag'
   ])
   .config(function (httpEtagProvider) {
     httpEtagProvider
