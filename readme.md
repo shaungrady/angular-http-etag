@@ -59,7 +59,7 @@ angular
   })
 ```
 
-_Need more information on how ETags work? [Read this.](http://bitworking.org/news/ETags__This_stuff_matters)._
+_Need more information on how ETags work? [Read this](http://bitworking.org/news/ETags__This_stuff_matters)._
 
 ## Detailed Documentation
 
