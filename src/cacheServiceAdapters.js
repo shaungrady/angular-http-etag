@@ -41,21 +41,29 @@ function cacheAdaptersConfig (httpEtagProvider) {
       },
       methods: {
         createCache: angular.noop,
-        getCache: function () {
-          return localStorage
+        getCache: function (localStorage, cacheId) {
+          return cacheId
         },
-        setItem: function (localStorage, itemKey, value) {
+        setItem: function (cacheId, itemKey, value) {
+          itemKey = cacheId + ':' + itemKey
           localStorage.setItem(itemKey, JSON.stringify(value))
         },
-        getItem: function (localStorage, itemKey) {
+        getItem: function (cacheId, itemKey) {
+          itemKey = cacheId + ':' + itemKey
           return JSON.parse(localStorage.getItem(itemKey))
         },
-        removeItem: function (localStorage, itemKey) {
+        removeItem: function (cacheId, itemKey) {
+          itemKey = cacheId + ':' + itemKey
           localStorage.removeItem(itemKey)
         },
-        removeAllItems: function (localStorage, itemKey) {
+        removeAllItems: function (cacheId, itemKey) {
+          var keyPrefix = cacheId + ':'
+          var keyPrefixLen = keyPrefix.length
+
           angular.forEach(localStorage, function (value, key) {
-            localStorage.removeItem(key)
+            if (key.substr(0, keyPrefixLen) === keyPrefix) {
+              localStorage.removeItem(key)
+            }
           })
         }
       }
@@ -67,21 +75,29 @@ function cacheAdaptersConfig (httpEtagProvider) {
       },
       methods: {
         createCache: angular.noop,
-        getCache: function () {
-          return sessionStorage
+        getCache: function (sessionStorage, cacheId) {
+          return cacheId
         },
-        setItem: function (sessionStorage, itemKey, value) {
+        setItem: function (cacheId, itemKey, value) {
+          itemKey = cacheId + ':' + itemKey
           sessionStorage.setItem(itemKey, JSON.stringify(value))
         },
-        getItem: function (sessionStorage, itemKey) {
+        getItem: function (cacheId, itemKey) {
+          itemKey = cacheId + ':' + itemKey
           return JSON.parse(sessionStorage.getItem(itemKey))
         },
-        removeItem: function (sessionStorage, itemKey) {
+        removeItem: function (cacheId, itemKey) {
+          itemKey = cacheId + ':' + itemKey
           sessionStorage.removeItem(itemKey)
         },
-        removeAllItems: function (sessionStorage, itemKey) {
+        removeAllItems: function (cacheId, itemKey) {
+          var keyPrefix = cacheId + ':'
+          var keyPrefixLen = keyPrefix.length
+
           angular.forEach(sessionStorage, function (value, key) {
-            sessionStorage.removeItem(key)
+            if (key.substr(0, keyPrefixLen) === keyPrefix) {
+              sessionStorage.removeItem(key)
+            }
           })
         }
       }
