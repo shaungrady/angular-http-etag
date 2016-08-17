@@ -1,6 +1,6 @@
 {
   "name": "angular-http-etag",
-  "version": "2.0.7",
+  "version": "2.0.8",
   "description": "Angular module allowing easy use of ETags",
   "homepage": "https://github.com/shaungrady/angular-http-etag",
   "author": "Shaun Grady (http://shaungrady.com)",
