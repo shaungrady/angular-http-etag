@@ -1,5 +1,5 @@
 /**
- * angular-http-etag v2.0.6
+ * angular-http-etag v2.0.7
  * Shaun Grady (http://shaungrady.com), 2016
  * https://github.com/shaungrady/angular-http-etag
  * Module: Universal Module Definition
@@ -2438,22 +2438,22 @@ function cacheAdaptersConfig (httpEtagProvider) {
         storesDeepCopies: false
       },
       methods: {
-        createCache: function ($cacheFactory, cacheId, options) {
+        createCache: function createCache ($cacheFactory, cacheId, options) {
           $cacheFactory(cacheId, options)
         },
-        getCache: function ($cacheFactory, cacheId) {
+        getCache: function getCache ($cacheFactory, cacheId) {
           return $cacheFactory.get(cacheId)
         },
-        setItem: function (cache, itemKey, value) {
+        setItem: function setItem (cache, itemKey, value) {
           cache.put(itemKey, value)
         },
-        getItem: function (cache, itemKey) {
+        getItem: function getItem (cache, itemKey) {
           return cache.get(itemKey)
         },
-        removeItem: function (cache, itemKey) {
+        removeItem: function removeItem (cache, itemKey) {
           cache.remove(itemKey)
         },
-        removeAllItems: function (cache, itemKey) {
+        removeAllItems: function removeAllItems (cache, itemKey) {
           cache.removeAll()
         }
       }
@@ -2465,22 +2465,22 @@ function cacheAdaptersConfig (httpEtagProvider) {
       },
       methods: {
         createCache: angular.noop,
-        getCache: function (localStorage, cacheId) {
+        getCache: function getCache (localStorage, cacheId) {
           return cacheId
         },
-        setItem: function (cacheId, itemKey, value) {
+        setItem: function setItem (cacheId, itemKey, value) {
           itemKey = cacheId + ':' + itemKey
           localStorage.setItem(itemKey, JSON.stringify(value))
         },
-        getItem: function (cacheId, itemKey) {
+        getItem: function getItem (cacheId, itemKey) {
           itemKey = cacheId + ':' + itemKey
           return JSON.parse(localStorage.getItem(itemKey))
         },
-        removeItem: function (cacheId, itemKey) {
+        removeItem: function removeItem (cacheId, itemKey) {
           itemKey = cacheId + ':' + itemKey
           localStorage.removeItem(itemKey)
         },
-        removeAllItems: function (cacheId, itemKey) {
+        removeAllItems: function removeAllItems (cacheId, itemKey) {
           var keyPrefix = cacheId + ':'
           var keyPrefixLen = keyPrefix.length
 
@@ -2499,22 +2499,22 @@ function cacheAdaptersConfig (httpEtagProvider) {
       },
       methods: {
         createCache: angular.noop,
-        getCache: function (sessionStorage, cacheId) {
+        getCache: function getCache (sessionStorage, cacheId) {
           return cacheId
         },
-        setItem: function (cacheId, itemKey, value) {
+        setItem: function setItem (cacheId, itemKey, value) {
           itemKey = cacheId + ':' + itemKey
           sessionStorage.setItem(itemKey, JSON.stringify(value))
         },
-        getItem: function (cacheId, itemKey) {
+        getItem: function getItem (cacheId, itemKey) {
           itemKey = cacheId + ':' + itemKey
           return JSON.parse(sessionStorage.getItem(itemKey))
         },
-        removeItem: function (cacheId, itemKey) {
+        removeItem: function removeItem (cacheId, itemKey) {
           itemKey = cacheId + ':' + itemKey
           sessionStorage.removeItem(itemKey)
         },
-        removeAllItems: function (cacheId, itemKey) {
+        removeAllItems: function removeAllItems (cacheId, itemKey) {
           var keyPrefix = cacheId + ':'
           var keyPrefixLen = keyPrefix.length
 
@@ -2582,14 +2582,14 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
 
     httpPromise = $http.apply($http, arguments)
 
-    httpPromise.cached = function (callback) {
+    httpPromise.cached = function httpEtagPromiseCached (callback) {
       if (isCachable && rawCacheData && cacheInfo.cacheResponseData) callback(cachedResponse, 'cached', undefined, httpConfig, itemCache)
       return httpPromise
     }
 
     if (itemCache) {
       var onSuccess = httpPromise.success
-      httpPromise.success = function (callback) {
+      httpPromise.success = function httpEtagPromiseSuccess (callback) {
         var partializedCallback = partial(callback, undefined, undefined, undefined, undefined, itemCache)
         return onSuccess(partializedCallback)
       }
@@ -2619,7 +2619,7 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
   })
 
   // Copy over all other properties and methods
-  angular.forEach($http, function (value, key) {
+  angular.forEach($http, function copyHttpPropertyToDectorator (value, key) {
     if (!$httpDecorator[key]) $httpDecorator[key] = value
   })
 
@@ -2731,7 +2731,9 @@ function httpEtagInterceptorFactory () {
     return response
   }
 
-  return { response: responseInterceptor }
+  return {
+    response: responseInterceptor
+  }
 }
 
 },{}],15:[function(_dereq_,module,exports){
@@ -2823,7 +2825,7 @@ function httpEtagProvider () {
    * .getItemCache(cacheId, itemKey)
    */
 
-  httpEtagProvider.$get = ['$injector', function ($injector) {
+  httpEtagProvider.$get = ['$injector', function httpEtagFactory ($injector) {
     var httpEtagService = {}
 
     var services = {}
@@ -2835,7 +2837,7 @@ function httpEtagProvider () {
     if (!cacheDefinitions[defaultCacheId]) httpEtagProvider.defineCache(defaultCacheId)
 
     // Find/inject cache service and create adapted versions
-    angular.forEach(cacheAdapters, function (adapter, serviceName) {
+    angular.forEach(cacheAdapters, function adaptCacheService (adapter, serviceName) {
       var service = services[serviceName] = window[serviceName] || $injector.get(serviceName)
       var adaptedService = adaptedServices[serviceName] = {}
 
@@ -2845,7 +2847,7 @@ function httpEtagProvider () {
     })
 
     // Instantiate caches and create adapted versions
-    angular.forEach(cacheDefinitions, function (config, cacheId) {
+    angular.forEach(cacheDefinitions, function adaptCache (config, cacheId) {
       adaptedServices[config.cacheService].createCache(cacheId, config)
       var cache = caches[cacheId] = adaptedServices[config.cacheService].getCache(cacheId)
       var adaptedCache = adaptedCaches[cacheId] = {}
@@ -2939,7 +2941,7 @@ function httpEtagProvider () {
         ['remove', 'removeItem']
       ]
 
-      angular.forEach(methodMappings, function (methods) {
+      angular.forEach(methodMappings, function mapCacheMethdodsToItemCache (methods) {
         itemCache[methods[0]] = angular.bind({}, cache[methods[1]], itemKey)
       })
 
@@ -2982,11 +2984,11 @@ module.exports = angular
   .module('http-etag', [])
   .provider('httpEtag', service)
   .config(cacheServiceAdapters)
-  .config(['$provide', '$httpProvider', function ($provide, $httpProvider) {
+  .config(['$provide', '$httpProvider', function addHttpEtagInterceptor ($provide, $httpProvider) {
     _$provide = $provide
     $httpProvider.interceptors.push($httpInterceptor)
   }])
-  .run(function () {
+  .run(function decorateHttpService () {
     _$provide.decorator('$http', $httpDecorator)
   })
   .name
