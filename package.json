@@ -62,12 +62,8 @@
     "uglify-js": "^2.7.0",
     "zuul": "^3.10.3"
   },
-  "ignore": [
-    "**/.*",
-    "release/*.min.*",
-    "node_modules",
-    "docs",
-    "coverage",
-    "test"
+  "files": [
+    "src/*.js",
+    "readme.md"
   ]
 }
