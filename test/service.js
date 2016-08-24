@@ -107,6 +107,19 @@ describe('Service', function () {
     should.not.exist(itemCache)
   })
 
+  it('`purgeCaches` method should remove all items from all caches', function () {
+    var caches = cacheIds.map(httpEtag.getCache)
+    caches.forEach(function (cache) {
+      cache.setItem('hello', 'world')
+    })
+
+    httpEtag.purgeCaches()
+
+    caches.forEach(function (cache) {
+      should.not.exist(cache.getItem('hello'))
+    })
+  })
+
   /**
    * CACHE TESTS
    */
