@@ -1,14 +1,14 @@
 'use strict'
 
+import angular from 'angular'
 import service from './service'
 import httpDecorator from './httpDecorator'
 import httpInterceptor from './httpInterceptor'
 import cacheServiceAdapters from './cacheServiceAdapters'
 
-import angular from 'angular'
 var _$provide
 
-module.exports = angular
+export default angular
   .module('http-etag', [])
   .provider('httpEtag', service)
   .config(cacheServiceAdapters)
