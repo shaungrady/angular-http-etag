@@ -43,6 +43,7 @@ Manipulate caches and cache items defined through the [Service Provider](service
 | `info()` | Returns an object with information about the cache configuration. |
 | `getCache([cacheId])` | Returns a `cache` object matching the specified `cacheId`.<br>If no `cacheId` is specified, the default cache is returned. |
 | `getItemCache(cacheId, itemKey)` | Returns an `itemCache`—a `cache` object that's bound to the specified item.<br>A shortcut for `httpEtag.getCache('id').getCacheItem('itemKey')`. |
+| `purgeCaches()` | Remove all cache items from all defined caches. |
 
 There are two kinds of cache objects. A `cache` and an `itemCache`. A `cache` object can interact with all items or a specific item within that cache. An `itemCache` only interacts with a specific item in a cache. They share many of the same methods, but with a small difference in naming. The `itemCache` is detailed below.
 
