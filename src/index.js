@@ -1,12 +1,11 @@
 'use strict'
 
-var angular = require('angular')
+import service from './service'
+import httpDecorator from './httpDecorator'
+import httpInterceptor from './httpInterceptor'
+import cacheServiceAdapters from './cacheServiceAdapters'
 
-var service = require('./service')
-var $httpDecorator = require('./httpDecorator')
-var $httpInterceptor = require('./httpInterceptor')
-var cacheServiceAdapters = require('./cacheServiceAdapters')
-
+import angular from 'angular'
 var _$provide
 
 module.exports = angular
@@ -15,9 +14,9 @@ module.exports = angular
   .config(cacheServiceAdapters)
   .config(['$provide', '$httpProvider', function addHttpEtagInterceptor ($provide, $httpProvider) {
     _$provide = $provide
-    $httpProvider.interceptors.push($httpInterceptor)
+    $httpProvider.interceptors.push(httpInterceptor)
   }])
   .run(function decorateHttpService () {
-    _$provide.decorator('$http', $httpDecorator)
+    _$provide.decorator('$http', httpDecorator)
   })
   .name

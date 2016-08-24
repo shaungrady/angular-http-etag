@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = httpEtagInterceptorFactory
+export default httpEtagInterceptorFactory
 
 function httpEtagInterceptorFactory () {
   function responseInterceptor (response) {

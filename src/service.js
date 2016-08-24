@@ -1,9 +1,9 @@
 'use strict'
 
-var angular = require('angular')
-var deepcopy = require('deepcopy')
+import angular from 'angular'
+import deepcopy from 'deepcopy'
 
-module.exports = httpEtagProvider
+export default httpEtagProvider
 
 function httpEtagProvider () {
   var httpEtagProvider = this
