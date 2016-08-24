@@ -216,6 +216,12 @@ function httpEtagProvider () {
       return itemCache
     }
 
+    httpEtagService.purgeCaches = function httpEtagPurgeCaches () {
+      angular.forEach(adaptedCaches, function (cache) {
+        cache.removeAllItems()
+      })
+    }
+
     function processCacheId (cacheId) {
       var type = typeof cacheId
       var isDefined = type === 'number' || (type === 'string' && !!cacheId)

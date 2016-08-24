@@ -111,12 +111,14 @@ describe('Service', function () {
     var caches = cacheIds.map(httpEtag.getCache)
     caches.forEach(function (cache) {
       cache.setItem('hello', 'world')
+      cache.setItem('greetings', 'universe')
     })
 
     httpEtag.purgeCaches()
 
     caches.forEach(function (cache) {
       should.not.exist(cache.getItem('hello'))
+      should.not.exist(cache.getItem('greetings'))
     })
   })
 
