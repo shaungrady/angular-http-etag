@@ -370,7 +370,6 @@ describe('HTTP Decorator', function () {
   it('should throw an error when specifying a bad cache ID', function () {
     function badCacheIdRequest () {
       $http.get('/1.json', { etagCache: 'Undefined Cache' })
-      $httpBackend.flush()
     }
 
     badCacheIdRequest.should.throw(Error)
