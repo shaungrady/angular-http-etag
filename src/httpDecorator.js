@@ -1,10 +1,10 @@
 'use strict'
 
-var angular = require('angular')
-var objectKeys = require('object-keys')
-var arrayMap = require('array-map')
+import angular from 'angular'
+import objectKeys from 'object-keys'
+import arrayMap from 'array-map'
 
-module.exports = httpEtagHttpDecorator
+export default httpEtagHttpDecorator
 
 httpEtagHttpDecorator.$inject = ['$delegate', 'httpEtag']
 

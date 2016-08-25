@@ -1,8 +1,8 @@
 'use strict'
 
-var angular = require('angular')
+import angular from 'angular'
 
-module.exports = cacheAdaptersConfig
+export default cacheAdaptersConfig
 
 cacheAdaptersConfig.$inject = ['httpEtagProvider']
 
