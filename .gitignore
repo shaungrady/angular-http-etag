@@ -1,6 +1,5 @@
 node_modules/
-lib/
-release/
 coverage/
+test-build/
 
 npm-debug.log

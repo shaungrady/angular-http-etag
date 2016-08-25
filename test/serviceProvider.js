@@ -16,7 +16,7 @@ describe('Service Provider', function () {
         httpEtagProvider = __httpEtagProvider
       }])
 
-    angular.mock.module(require('../lib/'))
+    angular.mock.module(require('../test-build/'))
     angular.mock.module('test')
     angular.mock.inject(function ($injector) {
       httpEtag = $injector.get('httpEtag')
