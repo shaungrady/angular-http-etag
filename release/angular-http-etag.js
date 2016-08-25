@@ -1,8 +1,8 @@
 /**
- * angular-http-etag v2.0.9
+ * angular-http-etag v2.0.10
  * Shaun Grady (http://shaungrady.com), 2016
  * https://github.com/shaungrady/angular-http-etag
- * Module: Universal Module Definition
+ * Module Format: Universal Module Definition
  * License: MIT
  */
 
@@ -810,10 +810,6 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
     var isCachable = hasConfig && isCacheableMethod
     var httpPromise
 
-    if (hasConfig && !isCacheableMethod && console && console.warn) {
-      console.warn('Cannot cache HTTP ' + httpConfig.method + ' requests')
-    }
-
     if (isCachable) {
       var etagCacheConfig = processHttpConfigEtagValue(httpConfig)
       if (etagCacheConfig) {
@@ -857,21 +853,14 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
   // Decorate the cachable shortcut methods, too
   angular.forEach(cachableHttpMethods, function (httpMethod) {
     var method = httpMethod.toLowerCase()
-    var isCachable = cachableHttpMethods.indexOf(httpMethod) >= 0
-    var shortcutMethod
+    $httpDecorator[method] = function httpEtagHttpShortcutWrapper (url, config) {
+      config = angular.extend({}, config, {
+        method: httpMethod,
+        url: url
+      })
 
-    if (!isCachable) shortcutMethod = $http[method]
-    else {
-      shortcutMethod = function httpEtagHttpShortcutWrapper (url, config) {
-        config = angular.extend({}, config, {
-          method: httpMethod,
-          url: url
-        })
-
-        return $httpDecorator.call($http, config)
-      }
+      return $httpDecorator.call($http, config)
     }
-    $httpDecorator[method] = shortcutMethod
   })
 
   // Copy over all other properties and methods
@@ -1040,10 +1029,9 @@ function cacheAdaptersConfig (httpEtagProvider) {
         },
         removeAllItems: function removeAllItems (cacheId, itemKey) {
           var keyPrefix = cacheId + ':'
-          var keyPrefixLen = keyPrefix.length
 
           angular.forEach(localStorage, function (value, key) {
-            if (key.substr(0, keyPrefixLen) === keyPrefix) {
+            if (key.indexOf(keyPrefix) === 0) {
               localStorage.removeItem(key)
             }
           })
@@ -1074,10 +1062,9 @@ function cacheAdaptersConfig (httpEtagProvider) {
         },
         removeAllItems: function removeAllItems (cacheId, itemKey) {
           var keyPrefix = cacheId + ':'
-          var keyPrefixLen = keyPrefix.length
 
           angular.forEach(sessionStorage, function (value, key) {
-            if (key.substr(0, keyPrefixLen) === keyPrefix) {
+            if (key.indexOf(keyPrefix) === 0) {
               sessionStorage.removeItem(key)
             }
           })
