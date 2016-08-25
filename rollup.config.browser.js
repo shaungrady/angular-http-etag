@@ -1,6 +1,8 @@
-import banner from './rollup.banner.js'
+import bannerTemplate from './rollup.banner.js'
 import commonjs from 'rollup-plugin-commonjs'
 import nodeResolve from 'rollup-plugin-node-resolve'
+
+let banner = bannerTemplate.replace('<module_format>', 'Universal Module Definition')
 
 export default {
   banner,
