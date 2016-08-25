@@ -14,7 +14,7 @@
     "test-coverage": "mochify --plugin [ mochify-istanbul --report lcov --dir './coverage' ] ./test/",
     "test-saucelabs": "npm run build && zuul ./test/*.js",
     "preversion": "npm run test",
-    "version": "npm run build && npm run build-umd && git add -f -A lib/*.js release/*.js",
+    "version": "rm -rf lib/ release/ && npm run build && npm run build-umd && git add -f -A lib/ release/",
     "patch": "npm version patch -m '%s'"
   },
   "repository": {
