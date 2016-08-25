@@ -5,14 +5,14 @@
   "homepage": "https://github.com/shaungrady/angular-http-etag",
   "author": "Shaun Grady (http://shaungrady.com)",
   "license": "MIT",
-  "main": "./src",
+  "main": "./lib",
   "scripts": {
-    "start": "mochify --watch ./test/",
-    "build": "node ./scripts/build.js",
-    "test": "npm run phantom && npm run coverage && eslint ./",
+    "build": "rollup -c",
+    "build-umd": "rollup -c rollup.config.browser.js && rollup -c rollup.config.browser-min.js",
+    "test": "npm run rollup && npm run phantom && npm run coverage && eslint ./src",
+    "test-saucelabs": "npm run rollup && zuul ./test/*.js",
     "phantom": "mochify -R spec ./test/",
-    "coverage": "mochify --plugin [ mochify-istanbul --report lcov --dir './coverage' ] ./test/",
-    "saucelabs-test": "zuul ./test/*.js"
+    "coverage": "mochify --plugin [ mochify-istanbul --report lcov --dir './coverage' ] ./test/"
   },
   "repository": {
     "type": "git",
@@ -60,11 +60,14 @@
     "mochify-istanbul": "^2.4.1",
     "phantomjs-prebuilt": "^2.1.9",
     "rollup": "^0.34.10",
+    "rollup-plugin-commonjs": "^3.3.1",
+    "rollup-plugin-node-resolve": "^2.0.0",
+    "rollup-plugin-uglify": "^1.0.1",
     "uglify-js": "^2.7.0",
     "zuul": "^3.10.3"
   },
   "files": [
-    "src/*.js",
+    "lib/*.js",
     "readme.md"
   ]
 }
