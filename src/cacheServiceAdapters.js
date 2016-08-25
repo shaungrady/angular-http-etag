@@ -58,10 +58,9 @@ function cacheAdaptersConfig (httpEtagProvider) {
         },
         removeAllItems: function removeAllItems (cacheId, itemKey) {
           var keyPrefix = cacheId + ':'
-          var keyPrefixLen = keyPrefix.length
 
           angular.forEach(localStorage, function (value, key) {
-            if (key.substr(0, keyPrefixLen) === keyPrefix) {
+            if (key.indexOf(keyPrefix) === 0) {
               localStorage.removeItem(key)
             }
           })
@@ -92,10 +91,9 @@ function cacheAdaptersConfig (httpEtagProvider) {
         },
         removeAllItems: function removeAllItems (cacheId, itemKey) {
           var keyPrefix = cacheId + ':'
-          var keyPrefixLen = keyPrefix.length
 
           angular.forEach(sessionStorage, function (value, key) {
-            if (key.substr(0, keyPrefixLen) === keyPrefix) {
+            if (key.indexOf(keyPrefix) === 0) {
               sessionStorage.removeItem(key)
             }
           })
