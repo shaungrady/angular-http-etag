@@ -4,6 +4,6 @@ export default `/**
  * ${packageData.name} v${packageData.version}
  * ${packageData.author}, ${new Date().getFullYear()}
  * ${packageData.homepage}
- * Module: Universal Module Definition
+ * Module Format: <module_format>
  * License: ${packageData.license}
  */\n`

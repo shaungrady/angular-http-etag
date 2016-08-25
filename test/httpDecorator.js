@@ -47,7 +47,7 @@ describe('HTTP Decorator', function () {
           })
       }])
 
-    angular.mock.module(require('../lib/'))
+    angular.mock.module(require('../test-build/'))
     angular.mock.module('test')
     angular.mock.inject(function ($injector) {
       httpEtag = $injector.get('httpEtag')
@@ -370,7 +370,6 @@ describe('HTTP Decorator', function () {
   it('should throw an error when specifying a bad cache ID', function () {
     function badCacheIdRequest () {
       $http.get('/1.json', { etagCache: 'Undefined Cache' })
-      $httpBackend.flush()
     }
 
     badCacheIdRequest.should.throw(Error)

@@ -9,13 +9,15 @@
   "scripts": {
     "build": "rollup -c",
     "build-umd": "rollup -c rollup.config.browser.js && rollup -c rollup.config.browser-min.js",
-    "test": "npm run build && npm run test-phantom && npm run test-coverage && eslint ./src",
+    "patch": "npm version patch -m '%s'",
+    "preversion": "npm run test",
+    "version": "rm -rf lib/ release/ && npm run build && npm run build-umd && git add -A lib/ release/",
+    "pretest": "npm run build -- --output test-build/index.js",
+    "test": " npm run test-phantom && npm run test-coverage && eslint ./",
+    "posttest": "rm -rf tmp/",
     "test-phantom": "mochify -R spec ./test/",
     "test-coverage": "mochify --plugin [ mochify-istanbul --report lcov --dir './coverage' ] ./test/",
-    "test-saucelabs": "npm run build && zuul ./test/*.js",
-    "preversion": "npm run test",
-    "version": "rm -rf lib/ release/ && npm run build && npm run build-umd && git add -f -A lib/ release/",
-    "patch": "npm version patch -m '%s'"
+    "test-saucelabs": "npm run pretest && zuul ./test/*.js && npm run posttest"
   },
   "repository": {
     "type": "git",
