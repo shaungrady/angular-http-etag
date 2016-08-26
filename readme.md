@@ -169,7 +169,7 @@ $http.get('/data', {
 
 function requestHandler(data, status, headers, config, itemCache) {
   itemCache.info()
-  // { id: 'httpEtagCache',
+  // { id: 'persistentCache',
   //   itemKey: '/data',
   //   deepCopy: false,
   //   cacheResponseData: true,
@@ -191,7 +191,7 @@ $http.get('/data', {
 
 function requestHandler(data, status, headers, config, itemCache) {
   itemCache.info()
-  // { id: 'httpEtagCache',
+  // { id: 'persistentCache',
   //   itemKey: 'whatFineKeyYouHave',
   //   deepCopy: false,
   //   cacheResponseData: true,
@@ -213,4 +213,5 @@ Write an issue. Then, possibly, hopefully...
 2. Make a branch.
 3. Write the code.
 3. Write the tests.
+3. Run tests. (`npm test`)
 3. Open a pull request.
