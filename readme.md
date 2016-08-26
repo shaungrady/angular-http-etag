@@ -49,6 +49,7 @@ angular
         self.fullName = data._fullName
       })
       // Synchronous method called if request was previously cached
+      // status == 'cached`; headers === undefined;
       .cached(function (data, status, headers, config, itemCache) {
         self.fullName = data._fullName
       })
@@ -140,10 +141,10 @@ Using the default cache with default configuration and an automatically generate
 $http.get('/data', {
     etagCache: true
   })
-  .cached(requestHandler)
-  .success(requestHandler)
+  .cached(responseHandler)
+  .success(responseHandler)
 
-function requestHandler(data, status, headers, config, itemCache) {
+function responseHandler (data, status, headers, config, itemCache) {
   // Differentiating between cached and successful request responses
   var isCached = status === 'cached'
 
@@ -164,10 +165,10 @@ Using a defined cache from the previous section and an automatically generated c
 $http.get('/data', {
     etagCache: 'persistentCache'
   })
-  .cached(requestHandler)
-  .success(requestHandler)
+  .cached(responseHandler)
+  .success(responseHandler)
 
-function requestHandler(data, status, headers, config, itemCache) {
+function responseHandler (data, status, headers, config, itemCache) {
   itemCache.info()
   // { id: 'persistentCache',
   //   itemKey: '/data',
@@ -186,10 +187,10 @@ $http.get('/data', {
       itemKey: 'whatFineKeyYouHave'
     }
   })
-  .cached(requestHandler)
-  .success(requestHandler)
+  .cached(responseHandler)
+  .success(responseHandler)
 
-function requestHandler(data, status, headers, config, itemCache) {
+function responseHandler (data, status, headers, config, itemCache) {
   itemCache.info()
   // { id: 'persistentCache',
   //   itemKey: 'whatFineKeyYouHave',
