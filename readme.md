@@ -49,7 +49,7 @@ angular
         self.fullName = data._fullName
       })
       // Synchronous method called if request was previously cached
-      // status == 'cached`; headers === undefined;
+      // status == 'cached'; headers === undefined;
       .cached(function (data, status, headers, config, itemCache) {
         self.fullName = data._fullName
       })
