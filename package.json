@@ -12,9 +12,9 @@
     "patch": "npm version patch -m '%s'",
     "preversion": "npm run test",
     "version": "rm -rf lib/ release/ && npm run build && npm run build-umd && git add -A lib/ release/",
-    "pretest": "npm run build -- --output test-build/index.js",
-    "test": " npm run test-phantom && npm run test-coverage && eslint ./",
-    "posttest": "rm -rf tmp/",
+    "pretest": "npm run build -- --output lib-test/index.js --m inline",
+    "test": "npm run test-phantom && npm run test-coverage && eslint ./",
+    "posttest": "rm -rf lib-test/",
     "test-phantom": "mochify -R spec ./test/",
     "test-coverage": "mochify --plugin [ mochify-istanbul --report lcov --dir './coverage' ] ./test/",
     "test-saucelabs": "npm run pretest && zuul ./test/*.js && npm run posttest"
