@@ -15,6 +15,10 @@ export default angular
   .config(['$provide', '$httpProvider', function addHttpEtagInterceptor ($provide, $httpProvider) {
     _$provide = $provide
     $httpProvider.interceptors.push(httpInterceptor)
+
+    httpDecorator.useLegacyPromiseExtensions =
+      $httpProvider.useLegacyPromiseExtensions ||
+      function useLegacyPromiseExtensions () { return true }
   }])
   .run(function decorateHttpService () {
     _$provide.decorator('$http', httpDecorator)

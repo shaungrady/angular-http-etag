@@ -9,6 +9,7 @@ var spy = chai.spy
 
 var httpEtagProvider
 var httpEtag
+var $httpProvider
 var $http
 var $httpBackend
 
@@ -38,8 +39,10 @@ describe('HTTP Decorator', function () {
   beforeEach(function () {
     angular
       .module('test', ['http-etag'])
-      .config(['httpEtagProvider', function (__httpEtagProvider) {
-        httpEtagProvider = __httpEtagProvider
+      .config(['httpEtagProvider', '$httpProvider', function (_httpEtagProvider_, _$httpProvider_) {
+        httpEtagProvider = _httpEtagProvider_
+        $httpProvider = _$httpProvider_
+
         httpEtagProvider
           .defineCache('testCache')
           .defineCache('cacheResponseDataFalseTestCache', {
@@ -47,7 +50,7 @@ describe('HTTP Decorator', function () {
           })
       }])
 
-    angular.mock.module(require('../test-build/'))
+    angular.mock.module(require('../lib-test/'))
     angular.mock.module('test')
     angular.mock.inject(function ($injector) {
       httpEtag = $injector.get('httpEtag')
@@ -219,6 +222,77 @@ describe('HTTP Decorator', function () {
         cacheInfo.id.should.equal('httpEtagCache')
       })
     $httpBackend.flush()
+  })
+
+  it('should wrap `then` callback properly', function () {
+    var httpConfig = {
+      method: 'GET',
+      url: '/1.json',
+      etagCache: true
+    }
+    var promise = $http(httpConfig)
+
+    promise.cached.should.be.a('function')
+
+    promise
+      .then(function (response, itemCache) {
+        var data = response.data
+        var status = response.status
+        var headers = response.headers
+        var config = response.config
+
+        data.should.deep.equal(mockResponseData)
+        expect(status).to.equal(200)
+        headers.should.be.a('function')
+        config.method.should.equal(httpConfig.method)
+        config.url.should.equal(httpConfig.url)
+        config.etagCache.should.equal(httpConfig.etagCache)
+        var cacheInfo = itemCache.info()
+        cacheInfo.id.should.equal('httpEtagCache')
+      })
+    $httpBackend.flush()
+  })
+
+  it('should wrap promise returned by `then`', function () {
+    var httpConfig = {
+      method: 'GET',
+      url: '/1.json',
+      etagCache: true
+    }
+
+    var thenPromise = $http(httpConfig).then()
+
+    thenPromise.cached.should.be.a('function')
+
+    thenPromise
+      .then(function (response, itemCache) {
+        var data = response.data
+        var status = response.status
+        var headers = response.headers
+        var config = response.config
+
+        data.should.deep.equal(mockResponseData)
+        expect(status).to.equal(200)
+        headers.should.be.a('function')
+        config.method.should.equal(httpConfig.method)
+        config.url.should.equal(httpConfig.url)
+        config.etagCache.should.equal(httpConfig.etagCache)
+        var cacheInfo = itemCache.info()
+        cacheInfo.id.should.equal('httpEtagCache')
+      })
+    $httpBackend.flush()
+  })
+
+  it('should not wrap `success` when `useLegacyPromiseExtensions` is false', function () {
+    $httpProvider.useLegacyPromiseExtensions(false)
+
+    var httpConfig = {
+      method: 'GET',
+      url: '/1.json',
+      etagCache: true
+    }
+
+    $http(httpConfig).success.should.throw(Error)
   })
 
   it('should use the default cacheId with `{ etagCache: true }`', function () {

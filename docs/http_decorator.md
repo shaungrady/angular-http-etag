@@ -5,7 +5,7 @@ Allows `angular-http-etag` to cache request ETags and response data.
 **Usage Example:**
 
 ``` javascript
-$http
+var promise = $http
   .get('/data', {
     // Also accepts a string, object, or function as detailed below
     etagCache: true
@@ -29,6 +29,18 @@ $http
   .error(function (data, status) {
     if (status != 304) alert('Request error')
   })
+
+// Or, without using legacy promise extensions:
+promise
+  .then(function successHandler (response, itemCache) {
+    var data = response.data
+    data._fullName = data.first_name + ' ' data.last_name
+    itemCache.set(data)
+    self.fullName = data._fullName
+  })
+  .cached(function (data, status, headers, config, itemCache) {
+    self.fullName = data._fullName
+  })
 ```
 
 ## cached Method
@@ -43,7 +55,7 @@ The `config` argument will return the `$http` config as normal.
 
 Lastly, an `itemCache` is passed in as the 5th argument allowing for easily
 manipulation of the cache item associated with the performed request.
-[More details](#itemcache-object) can be found below. 
+[More details](#itemcache-object) can be found below.
 
 
 ## $http Config

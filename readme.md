@@ -57,6 +57,14 @@ angular
         // 304: 'Not Modified'--Etag matched, cached data is fresh
         if (status != 304) alert('Request error')
       })
+
+      // Also wraps then method:
+      .then(function successHandler (response, itemCache) {
+        // ...
+      })
+      .cached(function (data, status, headers, config, itemCache) {
+        // ...
+      })
   })
 ```
 
