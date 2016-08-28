@@ -1,5 +1,5 @@
 /**
- * angular-http-etag v2.0.10
+ * angular-http-etag v2.0.11
  * Shaun Grady (http://shaungrady.com), 2016
  * https://github.com/shaungrady/angular-http-etag
  * Module Format: Universal Module Definition
@@ -805,6 +805,7 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
   ]
 
   function $httpDecorator (httpConfig) {
+    var useLegacyPromiseExtensions = httpEtagHttpDecorator.useLegacyPromiseExtensions()
     var hasConfig = !!httpConfig.etagCache
     var isCacheableMethod = cachableHttpMethods.indexOf(httpConfig.method) >= 0
     var isCachable = hasConfig && isCacheableMethod
@@ -833,18 +834,45 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
     }
 
     httpPromise = $http.apply($http, arguments)
+    httpEtagPromiseFactory(httpPromise)
 
-    httpPromise.cached = function httpEtagPromiseCached (callback) {
-      if (isCachable && rawCacheData && cacheInfo.cacheResponseData) callback(cachedResponse, 'cached', undefined, httpConfig, itemCache)
-      return httpPromise
-    }
+    function httpEtagPromiseFactory (httpPromise) {
+      var then = httpPromise.then
+      var success = httpPromise.success
 
-    if (itemCache) {
-      var onSuccess = httpPromise.success
-      httpPromise.success = function httpEtagPromiseSuccess (callback) {
-        var partializedCallback = partial(callback, undefined, undefined, undefined, undefined, itemCache)
-        return onSuccess(partializedCallback)
+      httpPromise.cached = function httpEtagPromiseCached (callback) {
+        if (isCachable && rawCacheData && cacheInfo.cacheResponseData) {
+          callback(cachedResponse, 'cached', undefined, httpConfig, itemCache)
+        }
+        return httpPromise
       }
+
+      httpPromise.then = function httpEtagThenWrapper (successCallback, errorCallback, progressBackCallback) {
+        var thenPromise = then.apply(httpPromise, [
+          successCallback ? httpEtagSuccessWrapper : undefined,
+          errorCallback ? httpEtagErrorWrapper : undefined,
+          progressBackCallback
+        ])
+
+        function httpEtagSuccessWrapper (response) {
+          return successCallback(response, itemCache)
+        }
+
+        function httpEtagErrorWrapper (response) {
+          return errorCallback(response, itemCache)
+        }
+
+        return httpEtagPromiseFactory(thenPromise)
+      }
+
+      if (useLegacyPromiseExtensions && itemCache) {
+        httpPromise.success = function httpEtagPromiseSuccess (callback) {
+          var partializedCallback = partial(callback, undefined, undefined, undefined, undefined, itemCache)
+          return success.apply(httpPromise, [partializedCallback])
+        }
+      }
+
+      return httpPromise
     }
 
     return httpPromise
@@ -1082,6 +1110,10 @@ var index = angular
   .config(['$provide', '$httpProvider', function addHttpEtagInterceptor ($provide, $httpProvider) {
     _$provide = $provide
     $httpProvider.interceptors.push(httpEtagInterceptorFactory)
+
+    httpEtagHttpDecorator.useLegacyPromiseExtensions =
+      $httpProvider.useLegacyPromiseExtensions ||
+      function useLegacyPromiseExtensions () { return true }
   }])
   .run(function decorateHttpService () {
     _$provide.decorator('$http', httpEtagHttpDecorator)

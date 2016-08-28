@@ -1,6 +1,6 @@
 {
   "name": "angular-http-etag",
-  "version": "2.0.10",
+  "version": "2.0.11",
   "dependencies": {
     "array-map": {
       "version": "0.0.0",
