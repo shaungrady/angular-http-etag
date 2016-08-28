@@ -13,7 +13,7 @@ var promise = $http
 
   .success(function (data, status, headers, config, itemCache) {
     // Modify the data from the server
-    data._fullName = data.first_name + ' ' data.last_name
+    data._fullName = data.first_name + ' ' + data.last_name
     // Update the cache with the modified data
     itemCache.set(data)
     // Assign to controller property
@@ -34,7 +34,7 @@ var promise = $http
 promise
   .then(function successHandler (response, itemCache) {
     var data = response.data
-    data._fullName = data.first_name + ' ' data.last_name
+    data._fullName = data.first_name + ' ' + data.last_name
     itemCache.set(data)
     self.fullName = data._fullName
   })
