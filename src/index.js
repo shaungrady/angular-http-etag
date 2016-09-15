@@ -1,5 +1,3 @@
-'use strict'
-
 import angular from 'angular'
 import service from './service'
 import httpDecorator from './httpDecorator'

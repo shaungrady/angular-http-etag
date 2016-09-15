@@ -1,5 +1,3 @@
-'use strict'
-
 import angular from 'angular'
 import objectKeys from 'object-keys'
 import arrayMap from 'array-map'
