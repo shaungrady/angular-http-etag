@@ -61,7 +61,7 @@
     "mochify": "^2.18.1",
     "mochify-istanbul": "^2.4.1",
     "rollup": "^0.35.1",
-    "rollup-plugin-commonjs": "^4.1.0",
+    "rollup-plugin-commonjs": "^5.0.0",
     "rollup-plugin-node-resolve": "^2.0.0",
     "rollup-plugin-uglify": "^1.0.1",
     "zuul": "^3.10.3"
