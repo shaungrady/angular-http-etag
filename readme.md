@@ -99,7 +99,7 @@ Include `'http-etag'` in your module's dependencies.
 ``` javascript
 // The node module exports the string 'http-etag'...
 angular.module('myApp', [
-  require('http-etag')
+  require('angular-http-etag')
 ])
 ```
 
