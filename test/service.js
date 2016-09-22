@@ -254,9 +254,9 @@ describe('Service', function () {
           var exception
           var cache = httpEtag.getCache(id)
           try {
-              cache.setItem('test', testBigValue)
+            cache.setItem('test', testBigValue)
           } catch (e) {
-              exception = e;
+            exception = e;
           }
           should.not.exist(exception)
           should.not.exist(cache.getItem('test'))
