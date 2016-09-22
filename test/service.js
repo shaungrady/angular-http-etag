@@ -76,6 +76,10 @@ describe('Service', function () {
     })
   })
 
+  afterEach(function () {
+    httpEtag.purgeCaches()
+  })
+
   it('should get the default cache with no arguments', function () {
     var cache = httpEtag.getCache()
     cache.should.be.an('object')
