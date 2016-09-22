@@ -1,5 +1,5 @@
 /**
- * angular-http-etag v2.0.11
+ * angular-http-etag v2.0.12
  * Shaun Grady (http://shaungrady.com), 2016
  * https://github.com/shaungrady/angular-http-etag
  * Module Format: Universal Module Definition
@@ -1044,8 +1044,12 @@ function cacheAdaptersConfig (httpEtagProvider) {
           return cacheId
         },
         setItem: function setItem (cacheId, itemKey, value) {
-          itemKey = cacheId + ':' + itemKey
-          localStorage.setItem(itemKey, JSON.stringify(value))
+          try {
+            itemKey = cacheId + ':' + itemKey
+            localStorage.setItem(itemKey, JSON.stringify(value))
+          } catch (e) {
+
+          }
         },
         getItem: function getItem (cacheId, itemKey) {
           itemKey = cacheId + ':' + itemKey
@@ -1077,8 +1081,12 @@ function cacheAdaptersConfig (httpEtagProvider) {
           return cacheId
         },
         setItem: function setItem (cacheId, itemKey, value) {
-          itemKey = cacheId + ':' + itemKey
-          sessionStorage.setItem(itemKey, JSON.stringify(value))
+          try {
+            itemKey = cacheId + ':' + itemKey
+            sessionStorage.setItem(itemKey, JSON.stringify(value))
+          } catch (e) {
+
+          }
         },
         getItem: function getItem (cacheId, itemKey) {
           itemKey = cacheId + ':' + itemKey
