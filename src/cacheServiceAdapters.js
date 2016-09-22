@@ -47,9 +47,7 @@ function cacheAdaptersConfig (httpEtagProvider) {
             itemKey = cacheId + ':' + itemKey
             localStorage.setItem(itemKey, JSON.stringify(value))
           } catch (e) {
-            if (e.code !== DOMException.QUOTA_EXCEEDED_ERR) {
-              throw e
-            }
+
           }
         },
         getItem: function getItem (cacheId, itemKey) {
@@ -86,9 +84,7 @@ function cacheAdaptersConfig (httpEtagProvider) {
             itemKey = cacheId + ':' + itemKey
             sessionStorage.setItem(itemKey, JSON.stringify(value))
           } catch (e) {
-            if (e.code !== DOMException.QUOTA_EXCEEDED_ERR) {
-              throw e
-            }
+
           }
         },
         getItem: function getItem (cacheId, itemKey) {
