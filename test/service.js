@@ -14,6 +14,7 @@ var cacheIds = [
 ]
 var testValue
 var testRawValue
+var testBigValue
 
 describe('Service', function () {
   beforeEach(function () {
@@ -23,6 +24,7 @@ describe('Service', function () {
       etagHeader: '101',
       other: testValue
     }
+    testBigValue = 'x'.repeat(12*1024*1024/2)
 
     angular
       .module('test', ['http-etag'])
@@ -242,6 +244,22 @@ describe('Service', function () {
           itemCache.get.should.be.a('function')
           itemCache.set.should.be.a('function')
           itemCache.remove.should.be.a('function')
+        })
+      })
+    })
+
+    describe('`setItem` should not throw exception on very large items', function () {
+      cacheIds.forEach(function (id) {
+        it('(using ' + id.replace('TestCache', '') + ')', function () {
+          var exception
+          var cache = httpEtag.getCache(id)
+          try {
+              cache.setItem('test', testBigValue)
+          } catch (e) {
+              exception = e;
+          }
+          should.not.exist(exception)
+          should.not.exist(cache.getItem('test'))
         })
       })
     })
