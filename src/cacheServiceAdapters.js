@@ -43,8 +43,14 @@ function cacheAdaptersConfig (httpEtagProvider) {
           return cacheId
         },
         setItem: function setItem (cacheId, itemKey, value) {
-          itemKey = cacheId + ':' + itemKey
-          localStorage.setItem(itemKey, JSON.stringify(value))
+          try {
+            itemKey = cacheId + ':' + itemKey
+            localStorage.setItem(itemKey, JSON.stringify(value))
+          } catch (e) {
+            if (e.code !== DOMException.QUOTA_EXCEEDED_ERR) {
+              throw e
+            }
+          }
         },
         getItem: function getItem (cacheId, itemKey) {
           itemKey = cacheId + ':' + itemKey
@@ -76,8 +82,14 @@ function cacheAdaptersConfig (httpEtagProvider) {
           return cacheId
         },
         setItem: function setItem (cacheId, itemKey, value) {
-          itemKey = cacheId + ':' + itemKey
-          sessionStorage.setItem(itemKey, JSON.stringify(value))
+          try {
+            itemKey = cacheId + ':' + itemKey
+            sessionStorage.setItem(itemKey, JSON.stringify(value))
+          } catch (e) {
+            if (e.code !== DOMException.QUOTA_EXCEEDED_ERR) {
+              throw e
+            }
+          }
         },
         getItem: function getItem (cacheId, itemKey) {
           itemKey = cacheId + ':' + itemKey
