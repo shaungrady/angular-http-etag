@@ -1,5 +1,5 @@
 /**
- * angular-http-etag v2.0.12
+ * angular-http-etag v2.0.13
  * Shaun Grady (http://shaungrady.com), 2016
  * https://github.com/shaungrady/angular-http-etag
  * Module Format: Universal Module Definition
@@ -13,10 +13,6 @@
 }(this, (function (angular) { 'use strict';
 
 angular = 'default' in angular ? angular['default'] : angular;
-
-function interopDefault(ex) {
-	return ex && typeof ex === 'object' && 'default' in ex ? ex['default'] : ex;
-}
 
 function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
@@ -99,27 +95,13 @@ exports.indexOf = indexOf;
 exports.isBuffer = isBuffer;
 });
 
-var polyfill$1 = interopDefault(polyfill);
-var isBuffer = polyfill.isBuffer;
-var indexOf = polyfill.indexOf;
-var getSymbols = polyfill.getSymbols;
-var getKeys = polyfill.getKeys;
-
-var require$$0$1 = Object.freeze({
-  default: polyfill$1,
-  isBuffer: isBuffer,
-  indexOf: indexOf,
-  getSymbols: getSymbols,
-  getKeys: getKeys
-});
-
-var copy = createCommonjsModule(function (module, exports) {
+var copy_1 = createCommonjsModule(function (module, exports) {
 'use strict';
 
 exports.__esModule = true;
 exports.copyValue = exports.copyCollection = exports.copy = void 0;
 
-var _polyfill = interopDefault(require$$0$1);
+var _polyfill = polyfill;
 
 var toString = Object.prototype.toString;
 
@@ -259,27 +241,14 @@ exports.copyCollection = copyCollection;
 exports.copyValue = copyValue;
 });
 
-var copy$1 = interopDefault(copy);
-var copyValue = copy.copyValue;
-var copyCollection = copy.copyCollection;
-var copy$$1 = copy.copy;
-
-
-var require$$1 = Object.freeze({
-  default: copy$1,
-  copyValue: copyValue,
-  copyCollection: copyCollection,
-  copy: copy$$1
-});
-
 var index$2 = createCommonjsModule(function (module, exports) {
 'use strict';
 
 exports.__esModule = true;
 
-var _copy = interopDefault(require$$1);
+var _copy = copy_1;
 
-var _polyfill = interopDefault(require$$0$1);
+var _polyfill = polyfill;
 
 function defaultCustomizer(target) {
   return void 0;
@@ -367,18 +336,7 @@ exports['default'] = deepcopy;
 module.exports = exports['default'];
 });
 
-var index$3 = interopDefault(index$2);
-
-
-var require$$0 = Object.freeze({
-  default: index$3
-});
-
-var index$1 = createCommonjsModule(function (module) {
-module.exports = interopDefault(require$$0);
-});
-
-var deepcopy = interopDefault(index$1);
+var index$1 = index$2;
 
 function httpEtagProvider () {
   var httpEtagProvider = this
@@ -490,7 +448,7 @@ function httpEtagProvider () {
       var serviceDeepCopies = cacheAdapters[config.cacheService].config.storesDeepCopies
       var deepCopy = !serviceDeepCopies && cacheDefinitions[cacheId].deepCopy
       var copy = function (value) {
-        return deepCopy ? deepcopy(value) : value
+        return deepCopy ? index$1(value) : value
       }
 
       angular.forEach(cacheAdapterMethods, function (method) {
@@ -607,13 +565,10 @@ function httpEtagProvider () {
   }]
 }
 
-var isArguments = createCommonjsModule(function (module) {
-'use strict';
+var toStr$1 = Object.prototype.toString;
 
-var toStr = Object.prototype.toString;
-
-module.exports = function isArguments(value) {
-	var str = toStr.call(value);
+var isArguments = function isArguments(value) {
+	var str = toStr$1.call(value);
 	var isArgs = str === '[object Arguments]';
 	if (!isArgs) {
 		isArgs = str !== '[object Array]' &&
@@ -621,27 +576,16 @@ module.exports = function isArguments(value) {
 			typeof value === 'object' &&
 			typeof value.length === 'number' &&
 			value.length >= 0 &&
-			toStr.call(value.callee) === '[object Function]';
+			toStr$1.call(value.callee) === '[object Function]';
 	}
 	return isArgs;
 };
-});
-
-var isArguments$1 = interopDefault(isArguments);
-
-
-var require$$0$2 = Object.freeze({
-	default: isArguments$1
-});
-
-var index$4 = createCommonjsModule(function (module) {
-'use strict';
 
 // modified from https://github.com/es-shims/es5-shim
 var has = Object.prototype.hasOwnProperty;
 var toStr = Object.prototype.toString;
 var slice = Array.prototype.slice;
-var isArgs = interopDefault(require$$0$2);
+var isArgs = isArguments;
 var isEnumerable = Object.prototype.propertyIsEnumerable;
 var hasDontEnumBug = !isEnumerable.call({ toString: null }, 'toString');
 var hasProtoEnumBug = isEnumerable.call(function () {}, 'prototype');
@@ -713,11 +657,11 @@ var equalsConstructorPrototypeIfNotBuggy = function (o) {
 var keysShim = function keys(object) {
 	var isObject = object !== null && typeof object === 'object';
 	var isFunction = toStr.call(object) === '[object Function]';
-	var isArguments = isArgs(object);
+	var isArguments$$1 = isArgs(object);
 	var isString = isObject && toStr.call(object) === '[object String]';
 	var theKeys = [];
 
-	if (!isObject && !isFunction && !isArguments) {
+	if (!isObject && !isFunction && !isArguments$$1) {
 		throw new TypeError('Object.keys called on a non-object');
 	}
 
@@ -728,7 +672,7 @@ var keysShim = function keys(object) {
 		}
 	}
 
-	if (isArguments && object.length > 0) {
+	if (isArguments$$1 && object.length > 0) {
 		for (var j = 0; j < object.length; ++j) {
 			theKeys.push(String(j));
 		}
@@ -774,13 +718,9 @@ keysShim.shim = function shimObjectKeys() {
 	return Object.keys || keysShim;
 };
 
-module.exports = keysShim;
-});
+var index$4 = keysShim;
 
-var objectKeys = interopDefault(index$4);
-
-var index$5 = createCommonjsModule(function (module) {
-module.exports = function (xs, f) {
+var index$5 = function (xs, f) {
     if (xs.map) return xs.map(f);
     var res = [];
     for (var i = 0; i < xs.length; i++) {
@@ -791,9 +731,6 @@ module.exports = function (xs, f) {
 };
 
 var hasOwn = Object.prototype.hasOwnProperty;
-});
-
-var arrayMap = interopDefault(index$5);
 
 httpEtagHttpDecorator.$inject = ['$delegate', 'httpEtag']
 
@@ -948,11 +885,11 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
 
   // Based on npm package "query-string"
   function stringifyParams (obj) {
-    return obj ? arrayMap(objectKeys(obj).sort(), function (key) {
+    return obj ? index$5(index$4(obj).sort(), function (key) {
       var val = obj[key]
 
       if (angular.isArray(val)) {
-        return arrayMap(val.sort(), function (val2) {
+        return index$5(val.sort(), function (val2) {
           return encodeURIComponent(key) + '=' + encodeURIComponent(val2)
         }).join('&')
       }
@@ -1109,23 +1046,17 @@ function cacheAdaptersConfig (httpEtagProvider) {
     })
 }
 
-var _$provide
-
 var index = angular
   .module('http-etag', [])
   .provider('httpEtag', httpEtagProvider)
   .config(cacheAdaptersConfig)
   .config(['$provide', '$httpProvider', function addHttpEtagInterceptor ($provide, $httpProvider) {
-    _$provide = $provide
-    $httpProvider.interceptors.push(httpEtagInterceptorFactory)
-
     httpEtagHttpDecorator.useLegacyPromiseExtensions =
       $httpProvider.useLegacyPromiseExtensions ||
       function useLegacyPromiseExtensions () { return true }
+    $provide.decorator('$http', httpEtagHttpDecorator)
+    $httpProvider.interceptors.push(httpEtagInterceptorFactory)
   }])
-  .run(function decorateHttpService () {
-    _$provide.decorator('$http', httpEtagHttpDecorator)
-  })
   .name
 
 return index;
