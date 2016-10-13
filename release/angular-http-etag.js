@@ -779,7 +779,16 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
 
       httpPromise.cached = function httpEtagPromiseCached (callback) {
         if (isCachable && rawCacheData && cacheInfo.cacheResponseData) {
-          callback(cachedResponse, 'cached', undefined, httpConfig, itemCache)
+          if(useLegacyPromiseExtensions) {
+            callback(cachedResponse, 'cached', undefined, httpConfig, itemCache)
+          } else {
+            callback({
+              data: cachedResponse,
+              status: 'cached',
+              headers: undefined,
+              config: httpConfig
+            }, itemCache)
+          }  
         }
         return httpPromise
       }
