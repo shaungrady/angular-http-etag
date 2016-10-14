@@ -295,6 +295,18 @@ describe('HTTP Decorator', function () {
     $http(httpConfig).success.should.throw(Error)
   })
 
+  it('should not wrap `cached` when `useLegacyPromiseExtensions` is false', function () {
+    $httpProvider.useLegacyPromiseExtensions(false)
+
+    var httpConfig = {
+      method: 'GET',
+      url: '/1.json',
+      etagCache: true
+    }
+
+    $http(httpConfig).cached.should.throw(Error)
+  })
+
   it('should use the default cacheId with `{ etagCache: true }`', function () {
     $http.get('/1.json', { etagCache: true })
     $httpBackend.flush()
