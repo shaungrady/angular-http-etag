@@ -71,6 +71,7 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
             config: httpConfig
           }, itemCache)
         }
+        return httpPromise
       }
 
       httpPromise.then = function httpEtagThenWrapper (successCallback, errorCallback, progressBackCallback) {

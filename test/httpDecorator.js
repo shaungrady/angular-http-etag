@@ -14,6 +14,7 @@ var $http
 var $httpBackend
 
 var cachedSpy
+var ifCachedSpy
 var successSpy
 var errorSpy
 
@@ -58,6 +59,7 @@ describe('HTTP Decorator', function () {
       $httpBackend = $injector.get('$httpBackend')
 
       cachedSpy = spy('cached', angular.noop)
+      ifCachedSpy = spy('ifCached', angular.noop)
       successSpy = spy('success', angular.noop)
       errorSpy = spy('error', angular.noop)
 
@@ -196,6 +198,33 @@ describe('HTTP Decorator', function () {
         config.method.should.equal(httpConfig.method)
         config.url.should.equal(httpConfig.url)
         config.etagCache.should.equal(httpConfig.etagCache)
+        var cacheInfo = itemCache.info()
+        cacheInfo.id.should.equal('httpEtagCache')
+      })
+      .error(errorSpy)
+    $httpBackend.flush()
+  })
+
+  it('should call `ifCached` callback with proper arguments', function () {
+    var httpConfig = {
+      method: 'GET',
+      url: '/1.json',
+      etagCache: true
+    }
+
+    $http(httpConfig)
+      .ifCached(ifCachedSpy)
+      .success(successSpy)
+    $httpBackend.flush()
+
+    $http(httpConfig)
+      .ifCached(function (response, itemCache) {
+        response.data.should.deep.equal(mockResponseData)
+        response.status.should.equal('cached')
+        should.not.exist(response.headers)
+        response.config.method.should.equal(httpConfig.method)
+        response.config.url.should.equal(httpConfig.url)
+        response.config.etagCache.should.equal(httpConfig.etagCache)
         var cacheInfo = itemCache.info()
         cacheInfo.id.should.equal('httpEtagCache')
       })
