@@ -49,11 +49,24 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
       var then = httpPromise.then
       var success = httpPromise.success
 
-      httpPromise.cached = function httpEtagPromiseCached (callback) {
-        if (isCachable && rawCacheData && cacheInfo.cacheResponseData) {
-          callback(cachedResponse, 'cached', undefined, httpConfig, itemCache)
+      if (useLegacyPromiseExtensions) {
+        httpPromise.cached = function httpEtagPromiseCached(callback) {
+          if (isCachable && rawCacheData && cacheInfo.cacheResponseData) {
+            callback(cachedResponse, 'cached', undefined, httpConfig, itemCache)
+          }
+          return httpPromise
         }
-        return httpPromise
+      }
+
+      httpPromise.ifCached = function httpEtagPromiseIfCached(successCallback, errorCallback, progressBackCallback) {
+        if (isCachable && rawCacheData && cacheInfo.cacheResponseData) {
+          successCallback({
+            data: cachedResponse,
+            status: 'cached',
+            headers: undefined,
+            config: httpConfig
+          }, itemCache);
+        }
       }
 
       httpPromise.then = function httpEtagThenWrapper (successCallback, errorCallback, progressBackCallback) {
