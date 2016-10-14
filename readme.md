@@ -3,7 +3,7 @@
 [![npm version](https://badge.fury.io/js/angular-http-etag.svg)](http://badge.fury.io/js/angular-http-etag)
 [![Build Status](https://travis-ci.org/shaungrady/angular-http-etag.svg?branch=master)](https://travis-ci.org/shaungrady/angular-http-etag)
 [![Test Coverage](https://codeclimate.com/github/shaungrady/angular-http-etag/badges/coverage.svg)](https://codeclimate.com/github/shaungrady/angular-http-etag/coverage)
-[![Code Climate](https://codeclimate.com/github/shaungrady/angular-http-etag/badges/gpa.svg)](https://codeclimate.com/github/shaungrady/angular-http-etag)  
+[![Code Climate](https://codeclimate.com/github/shaungrady/angular-http-etag/badges/gpa.svg)](https://codeclimate.com/github/shaungrady/angular-http-etag)
 [![Dependency Status](https://david-dm.org/shaungrady/angular-http-etag.svg)](https://david-dm.org/shaungrady/angular-http-etag)
 [![devDependency Status](https://david-dm.org/shaungrady/angular-http-etag/dev-status.svg)](https://david-dm.org/shaungrady/angular-http-etag#info=devDependencies)
 [![JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
@@ -16,6 +16,7 @@ Easy ETag-based caching for `$http` service requests! Increase responsiveness, d
 
 * Caches ETag headers and sends them back to the server in the `If-None-Match` header.
 * Caches response data with flexible cache configuration.
+* Supports caching of headers when configured
 * Support for `$cacheFactory`, `sessionStorage`, and `localStorage` caches out-of-the-box.
 * Easily [adaptable][Cache Service Adapters] for other third-party cache services.
 
@@ -99,7 +100,7 @@ Include `'http-etag'` in your module's dependencies.
 ``` javascript
 // The node module exports the string 'http-etag'...
 angular.module('myApp', [
-  require('angular-http-etag')
+  require('http-etag')
 ])
 ```
 

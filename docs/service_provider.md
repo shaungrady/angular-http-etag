@@ -7,13 +7,13 @@ cache services.
 
 ``` javascript
 angular
-  .module('myModule', ['angular-http-etag'])
+  .module('myModule', ['http-etag'])
   .config(function(httpEtagProvider) {
 
     httpEtagProvider
       .setDefaultCacheConfig({
         // Default cacheService is `$cacheFactory`
-        cacheOptions: { number: 10 }          
+        cacheOptions: { number: 10 }
       })
       .defineCache('lruCache', {
         deepCopy: true
@@ -78,6 +78,7 @@ httpEtagProvider
 | `cacheOptions` | `object` | Options passed to the cache service when instantiating the cache. |
 | `deepCopy` | `boolean` | Create a deep copy of the data when setting and getting cache data. |
 | `cacheResponseData` | `boolean` | Whether or not the response data should be cached. ETag header will be cached regardless.
+| `cacheResponseHeaders` | `boolean` | Wether or not the response headers should be cached |
 
 Default configuration:
 
@@ -88,7 +89,8 @@ Default configuration:
     number: 25
   },
   deepCopy: false,
-  cacheResponseData: true
+  cacheResponseData: true,
+  cacheResponseHeaders: false
 }
 ```
 
