@@ -14,8 +14,8 @@ function httpEtagInterceptorFactory () {
       if (etag) {
         cacheData.etagHeader = etag
         if (cacheResponseData) cacheData.responseData = response.data
-        //TODO: Allow user to speficy which headers to cache?
-        if(cacheResponseHeaders) cacheData.responseHeaders = response.headers
+        // TODO: Allow user to speficy which headers to cache?
+        if (cacheResponseHeaders) cacheData.responseHeaders = response.headers
         itemCache.$set(cacheData)
       }
 
