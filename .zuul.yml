@@ -12,6 +12,6 @@ browsers:
   - name: microsoftedge
     version: -1..latest
   - name: android
-    version: 4.4.4
+    version: 4.4
   - name: iphone
     version: -1..latest
