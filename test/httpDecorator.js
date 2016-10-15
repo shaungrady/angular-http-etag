@@ -14,6 +14,7 @@ var $http
 var $httpBackend
 
 var cachedSpy
+var ifCachedSpy
 var successSpy
 var errorSpy
 
@@ -58,6 +59,7 @@ describe('HTTP Decorator', function () {
       $httpBackend = $injector.get('$httpBackend')
 
       cachedSpy = spy('cached', angular.noop)
+      ifCachedSpy = spy('ifCached', angular.noop)
       successSpy = spy('success', angular.noop)
       errorSpy = spy('error', angular.noop)
 
@@ -203,6 +205,33 @@ describe('HTTP Decorator', function () {
     $httpBackend.flush()
   })
 
+  it('should call `ifCached` callback with proper arguments', function () {
+    var httpConfig = {
+      method: 'GET',
+      url: '/1.json',
+      etagCache: true
+    }
+
+    $http(httpConfig)
+      .ifCached(ifCachedSpy)
+      .success(successSpy)
+    $httpBackend.flush()
+
+    $http(httpConfig)
+      .ifCached(function (response, itemCache) {
+        response.data.should.deep.equal(mockResponseData)
+        response.status.should.equal('cached')
+        should.not.exist(response.headers)
+        response.config.method.should.equal(httpConfig.method)
+        response.config.url.should.equal(httpConfig.url)
+        response.config.etagCache.should.equal(httpConfig.etagCache)
+        var cacheInfo = itemCache.info()
+        cacheInfo.id.should.equal('httpEtagCache')
+      })
+      .error(errorSpy)
+    $httpBackend.flush()
+  })
+
   it('should call `success` callback with proper arguments', function () {
     var httpConfig = {
       method: 'GET',
@@ -293,6 +322,18 @@ describe('HTTP Decorator', function () {
     }
 
     $http(httpConfig).success.should.throw(Error)
+  })
+
+  it('should not wrap `cached` when `useLegacyPromiseExtensions` is false', function () {
+    $httpProvider.useLegacyPromiseExtensions(false)
+
+    var httpConfig = {
+      method: 'GET',
+      url: '/1.json',
+      etagCache: true
+    }
+
+    $http(httpConfig).cached.should.throw(Error)
   })
 
   it('should use the default cacheId with `{ etagCache: true }`', function () {
