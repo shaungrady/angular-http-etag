@@ -16,7 +16,7 @@ var testValue
 var testRawValue
 var testBigValue
 
-var bigValueSize = 30 * 1024 * 1024
+var bigValueSize = 15 * 1024 * 1024
 for (var i = 0; i < bigValueSize; i++) {
   testBigValue += 'x'
 }
@@ -258,12 +258,16 @@ describe('Service', function () {
 
     describe('`setItem` should not throw exception on very large items', function () {
       cacheIds.forEach(function (id) {
-        it('(using ' + id.replace('TestCache', '') + ')', function () {
+        it('(using ' + id.replace('TestCache', '') + ')', function (done) {
+          this.timeout(15000)
+
           var cache = httpEtag.getCache(id)
           function setBigItem () {
             cache.setItem('test', testBigValue)
           }
           setBigItem.should.not.throw(Error)
+
+          done()
         })
       })
     })

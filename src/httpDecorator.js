@@ -50,10 +50,27 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
       var then = httpPromise.then
       var success = httpPromise.success
 
-      httpPromise.cached = function httpEtagPromiseCached (callback) {
-        if (isCachable && rawCacheData && cacheInfo.cacheResponseData) {
-          // Return cached headers as a function, to replicate normal success and then methods
-          callback(cachedResponse, 'cached', cachedHeaders ? function () { return cachedHeaders } : undefined, httpConfig, itemCache)
+      if (useLegacyPromiseExtensions) {
+        httpPromise.cached = function httpEtagPromiseCached (callback) {
+          if (rawCacheData && cacheInfo.cacheResponseData) {
+            callback(cachedResponse, 'cached', cachedHeaders ? function () { return cachedHeaders } : undefined, httpConfig, itemCache)
+          }
+          return httpPromise
+        }
+      } else {
+        httpPromise.cached = function deprecatedEtagPromiseCached () {
+          throw new Error('The method `cached` on the promise returned from `$http` has been disabled in favor of `ifCached`.')
+        }
+      }
+
+      httpPromise.ifCached = function httpEtagPromiseIfCached (callback) {
+        if (rawCacheData && cacheInfo.cacheResponseData) {
+          callback({
+            data: cachedResponse,
+            status: 'cached',
+            headers: cachedHeaders ? function () { return cachedHeaders } : undefined,
+            config: httpConfig
+          }, itemCache)
         }
         return httpPromise
       }
