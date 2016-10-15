@@ -58,7 +58,7 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
         }
       } else {
         httpPromise.cached = function deprecatedEtagPromiseCached () {
-          throw new Error('The method `cached` on the promise returned from `$http` has been disabled.')
+          throw new Error('The method `cached` on the promise returned from `$http` has been disabled in favor of `ifCached`.')
         }
       }
 
