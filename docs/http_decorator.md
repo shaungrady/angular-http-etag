@@ -31,6 +31,7 @@ var promise = $http
   })
 
 // Or, without using legacy promise extensions:
+// (`cached` method gets deprecated with the native extensions)
 promise
   .then(function successHandler (response, itemCache) {
     var data = response.data
@@ -38,8 +39,8 @@ promise
     itemCache.set(data)
     self.fullName = data._fullName
   })
-  .cached(function (data, status, headers, config, itemCache) {
-    self.fullName = data._fullName
+  .ifCached(function (response, itemCache) {
+    self.fullName = response.data._fullName
   })
 ```
 
