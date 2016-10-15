@@ -1,6 +1,6 @@
 {
   "name": "angular-http-etag",
-  "version": "2.0.13",
+  "version": "2.0.14",
   "description": "Angular module for easy ETag-based caching of $http responses",
   "homepage": "https://github.com/shaungrady/angular-http-etag",
   "author": "Shaun Grady (http://shaungrady.com)",
