@@ -49,7 +49,7 @@
     "angular": ">=1.2 <1.6"
   },
   "devDependencies": {
-    "angular": "~1.5.8",
+    "angular": "~1.6.1",
     "angular-mocks": "~1.5.8",
     "chai": "^3.5.0",
     "chai-spies": "^0.7.1",
