@@ -1,15 +1,20 @@
+sudo: false
+
 language: node_js
 node_js:
 - '6'
 env:
+  global:
   - CXX=g++-4.8
+  - secure: NucdRs7OveVFiyotvemchfveKewEx2Syh6H1DkJ9NtPRK9BandjtAHnXypUoHilCcslXftlkLwYzNNVBcH/mZ+p43E53vEotbYASb6vbkOw2NfI2EXWwbb+ddicEhzB8pqM1N2DnGDvME9m6Jx/DSDbhpnuKyiQ1CEKje0mqfsE15BG0SXT1ue1HIuGQv2/aAkc71yeRxN4nFJJSPcrpo05z1RQUacP+VFy5eQH635WrRls0M+Now7Rtp5up4rFt6GT2HHNLfqR3YAyxVOT/OXHBau1Um2Smho4BNYmCsQkLiMQyJqSgXEB1zzarbGd8zynCMWQrnxvirNmSQ47U8/dyqGSsIacSoWSPaLXDQicRNjB3opW5uF+0cMraTz1Pj05adcxh9SOj5PmZU8X3Q81OKyBMoTDRMgbaq9LZKJlz7lTmLohIpFeDyx2ONZs0Wi7M3JgNSUa2od7U6jG4uododhafL7Lo8CxPSXQkKVMyihI/1vhNVVhSNh3rzobKQsb8QiM70KMifpanIkrGjp/97zXTKs5ODiojqmebud1MuyQ2lnoOC3lV6fihC7DuervrJsGo7/l1v5Tt0O45Q7s73KIbzhnC1v0jMaIom8fdArSB5QzDQupUYknDCalgLF9JKtoJHzAkBQ3jY5L4no2pK5LffSGA6NDlOIxqZB0=
+  - secure: ENvUiuicEvGVS2vlAdHou4sd4AEPYD8gyev5uBqu7PvOwzx4cO9kGCkmePzKEKWbjOty1/6zTiELIcLeROI/EAsv72Lj89AKTA8xLZ4UHrkN1dwugjaOSErQ7dsSB9UzkuZV5+XoN46FNsVoyACbC4AHqXDWGuNcdl8DyFZs5i8d+E+ZdF4smIyBH57ednb6uN9d2cDHnob7oiuy/kj5jI6W00zyXntXRecOI1qynTiUSspwNein7HlNC0Xip7sBanE50Dc/C5STzqIWqmEnNmv1QWy9UGghoXrJR4HZsw+XxdfUJdCItOEFHm1ZhZhTWis2ESbpOvHrELGcR3anYaIj38Myr9vM3OrgTjv+lpnKJOFTdj5tw5cCLlNBxc6H56cNw5/Lr4x8vwUM2vXEQQidjXMkQjkRWPvHO2fLX0m9qyAu4Z2EduaE45SdouQTsWTAJv09wtEGtKroZiMyzx5Km70hzwaT60W71gkXUCgB1XIl3UkRgOv6yqK8OwnVrcig1pUauFEOkZQzVREPiFWQIrczIUhJ9x1YKMA8hICuLyXUklo8+LxapNqkPYfibNRnwJgI27ZY13+IMcJ/gLNFqan+Is5Rl186YgkNbusitgKqCZbdWWlUftt32xKE/IReew8q1UT3cqDMQd3wMKyFBJSVZeF0XMKh9kYBIOY=
+  - secure: nW28bNFl/3Af/tvIZN16JWB/jaJ4Ug/we1RQochidS8XsdA3fO8bHUL4jzRQHEeOg+ie8s76qB92Qyr8osPt0Apm6cPEAHKiPZqenjgM6udNppnPQLNbL+nhK/+ZQ+wDM5UykdtDhgsnzuM9ycScNaRCQIIfaEBHAiDP9oSoESTs5XjydRBIY/5yG47nbAnlcEj4v3ehrw700gXd+L0hj/jldifJScwslAurckBzkenwgIUX05I6taXBREnI2Jfa5UKQW705iogsHK4VSwKZiK0Aa7uvUqWsr3XmqZw2HinVsKW742k2jbW+TOxO3kRq1fC+UNE4WmxFv6T5FwglNNgBPHqtElonGh03VQkX3PVOYxYdYzpW1aY0Qlvc6dWHPEX+sy09R25JnXivzUmVMToqDvkRZDkuttIRcgqfWnnDL2lgd070qsT++RSO6dWesw75mGmPPYUv5Z2Yy0FcJ5zEbAT+O6TTJQxjJffc3xxS8YBlr+k0zkYe03lbzIL26IQzKp+sTYHqV1lnTBGwqKMnuT60U5deqQIctnsH2JsEKAWu14OM7oXbsTinUnB/SpYFHkcwJaXzYAD+x0fV7bfzwqla4n+CBqO8vhvW6RBokkttIbyHwubpTtDRVL2jGQUDnMx1hEHQ2nOgNNm8keKtxmJj20W7U87v77xLx1I=
 addons:
   apt:
     sources:
-      - ubuntu-toolchain-r-test
+    - ubuntu-toolchain-r-test
     packages:
-      - g++-4.8
-
+    - g++-4.8
 after_script:
-- codeclimate-test-reporter < coverage/lcov.info
-- npm run test-saucelabs
+- if [ "$TRAVIS_PULL_REQUEST" = "false" ]; codeclimate-test-reporter < coverage/lcov.info; fi
+- if [ "$TRAVIS_PULL_REQUEST" = "false" ]; npm run test-saucelabs; fi
