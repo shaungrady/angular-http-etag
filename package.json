@@ -62,7 +62,7 @@
     "mochify-istanbul": "^2.4.1",
     "phantomjs-prebuilt": "^2.1.13",
     "rollup": "^0.37.0",
-    "rollup-plugin-commonjs": "^5.0.4",
+    "rollup-plugin-commonjs": "^7.0.0",
     "rollup-plugin-node-resolve": "^2.0.0",
     "rollup-plugin-uglify": "^1.0.1",
     "zuul": "^3.11.1"
