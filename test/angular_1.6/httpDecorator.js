@@ -8,7 +8,6 @@ var spy = chai.spy
 
 var httpEtagProvider
 var httpEtag
-var $httpProvider
 var $http
 var $httpBackend
 
@@ -39,9 +38,9 @@ describe('HTTP Decorator', function () {
   beforeEach(function () {
     angular
       .module('test', ['http-etag'])
-      .config(['httpEtagProvider', '$httpProvider', function (_httpEtagProvider_, _$httpProvider_) {
+      .config(['httpEtagProvider', '$qProvider', function (_httpEtagProvider_, $qProvider) {
+        $qProvider.errorOnUnhandledRejections(false)
         httpEtagProvider = _httpEtagProvider_
-        $httpProvider = _$httpProvider_
 
         httpEtagProvider
           .defineCache('testCache')
@@ -109,17 +108,16 @@ describe('HTTP Decorator', function () {
 
   it('should cache response and ETag data', function () {
     $http.get('/1.json', { etagCache: true })
-      .cached(cachedSpy)
-      .success(successSpy)
+      .ifCached(cachedSpy)
+      .then(successSpy)
     $httpBackend.flush()
 
     cachedSpy.should.have.not.been.called
     successSpy.should.have.been.called.once
 
     $http.get('/1.json', { etagCache: true })
-      .cached(cachedSpy)
-      .success(successSpy)
-      .error(errorSpy)
+      .ifCached(cachedSpy)
+      .then(successSpy, errorSpy)
     $httpBackend.flush()
 
     cachedSpy.should.have.been.called.once
@@ -132,13 +130,13 @@ describe('HTTP Decorator', function () {
     $httpBackend.flush()
 
     $http.get('/1.json', { etagCache: true })
-      .cached(function (data, status, headers, config, itemCache) {
+      .ifCached(function (response, itemCache) {
         itemCache.unset()
       })
     $httpBackend.flush()
 
     $http.get('/1.json', { etagCache: true })
-      .cached(cachedSpy)
+      .ifCached(cachedSpy)
     $httpBackend.flush()
 
     cachedSpy.should.have.been.called.once
@@ -146,8 +144,8 @@ describe('HTTP Decorator', function () {
 
   it('should use a different itemKey for requests with params', function () {
     $http.get('/1.json', { etagCache: true })
-      .cached(cachedSpy)
-      .success(successSpy)
+      .ifCached(cachedSpy)
+      .then(successSpy)
     $httpBackend.flush()
 
     $http
@@ -155,8 +153,8 @@ describe('HTTP Decorator', function () {
         etagCache: true,
         params: mockParams
       })
-      .cached(cachedSpy)
-      .success(successSpy)
+      .ifCached(cachedSpy)
+      .then(successSpy)
     $httpBackend.flush()
 
     successSpy.should.have.been.called.twice
@@ -166,9 +164,8 @@ describe('HTTP Decorator', function () {
         etagCache: true,
         params: mockParams
       })
-      .cached(cachedSpy)
-      .success(successSpy)
-      .error(errorSpy)
+      .ifCached(cachedSpy)
+      .then(successSpy, errorSpy)
     $httpBackend.flush()
 
     successSpy.should.have.been.called.twice
@@ -184,35 +181,8 @@ describe('HTTP Decorator', function () {
     }
 
     $http(httpConfig)
-      .cached(cachedSpy)
-      .success(successSpy)
-    $httpBackend.flush()
-
-    $http(httpConfig)
-      .cached(function (data, status, headers, config, itemCache) {
-        data.should.deep.equal(mockResponseData)
-        status.should.equal('cached')
-        should.not.exist(headers)
-        config.method.should.equal(httpConfig.method)
-        config.url.should.equal(httpConfig.url)
-        config.etagCache.should.equal(httpConfig.etagCache)
-        var cacheInfo = itemCache.info()
-        cacheInfo.id.should.equal('httpEtagCache')
-      })
-      .error(errorSpy)
-    $httpBackend.flush()
-  })
-
-  it('should call `ifCached` callback with proper arguments', function () {
-    var httpConfig = {
-      method: 'GET',
-      url: '/1.json',
-      etagCache: true
-    }
-
-    $http(httpConfig)
-      .ifCached(ifCachedSpy)
-      .success(successSpy)
+      .ifCached(cachedSpy)
+      .then(successSpy)
     $httpBackend.flush()
 
     $http(httpConfig)
@@ -226,7 +196,34 @@ describe('HTTP Decorator', function () {
         var cacheInfo = itemCache.info()
         cacheInfo.id.should.equal('httpEtagCache')
       })
-      .error(errorSpy)
+      .catch(errorSpy)
+    $httpBackend.flush()
+  })
+
+  it('should call `ifCached` callback with proper arguments', function () {
+    var httpConfig = {
+      method: 'GET',
+      url: '/1.json',
+      etagCache: true
+    }
+
+    $http(httpConfig)
+      .ifCached(ifCachedSpy)
+      .then(successSpy)
+    $httpBackend.flush()
+
+    $http(httpConfig)
+      .ifCached(function (response, itemCache) {
+        response.data.should.deep.equal(mockResponseData)
+        response.status.should.equal('cached')
+        should.not.exist(response.headers)
+        response.config.method.should.equal(httpConfig.method)
+        response.config.url.should.equal(httpConfig.url)
+        response.config.etagCache.should.equal(httpConfig.etagCache)
+        var cacheInfo = itemCache.info()
+        cacheInfo.id.should.equal('httpEtagCache')
+      })
+      .catch(errorSpy)
     $httpBackend.flush()
   })
 
@@ -238,13 +235,13 @@ describe('HTTP Decorator', function () {
     }
 
     $http(httpConfig)
-      .success(function (data, status, headers, config, itemCache) {
-        data.should.deep.equal(mockResponseData)
-        expect(status).to.equal(200)
-        headers.should.be.a('function')
-        config.method.should.equal(httpConfig.method)
-        config.url.should.equal(httpConfig.url)
-        config.etagCache.should.equal(httpConfig.etagCache)
+      .then(function (response, itemCache) {
+        response.data.should.deep.equal(mockResponseData)
+        expect(response.status).to.equal(200)
+        response.headers.should.be.a('function')
+        response.config.method.should.equal(httpConfig.method)
+        response.config.url.should.equal(httpConfig.url)
+        response.config.etagCache.should.equal(httpConfig.etagCache)
         var cacheInfo = itemCache.info()
         cacheInfo.id.should.equal('httpEtagCache')
       })
@@ -259,7 +256,7 @@ describe('HTTP Decorator', function () {
     }
     var promise = $http(httpConfig)
 
-    promise.cached.should.be.a('function')
+    promise.ifCached.should.be.a('function')
 
     promise
       .then(function (response, itemCache) {
@@ -289,7 +286,7 @@ describe('HTTP Decorator', function () {
 
     var thenPromise = $http(httpConfig).then()
 
-    thenPromise.cached.should.be.a('function')
+    thenPromise.ifCached.should.be.a('function')
 
     thenPromise
       .then(function (response, itemCache) {
@@ -310,36 +307,12 @@ describe('HTTP Decorator', function () {
     $httpBackend.flush()
   })
 
-  it('should not wrap `success` when `useLegacyPromiseExtensions` is false', function () {
-    $httpProvider.useLegacyPromiseExtensions(false)
-
-    var httpConfig = {
-      method: 'GET',
-      url: '/1.json',
-      etagCache: true
-    }
-
-    $http(httpConfig).success.should.throw(Error)
-  })
-
-  it('should not wrap `cached` when `useLegacyPromiseExtensions` is false', function () {
-    $httpProvider.useLegacyPromiseExtensions(false)
-
-    var httpConfig = {
-      method: 'GET',
-      url: '/1.json',
-      etagCache: true
-    }
-
-    $http(httpConfig).cached.should.throw(Error)
-  })
-
   it('should use the default cacheId with `{ etagCache: true }`', function () {
     $http.get('/1.json', { etagCache: true })
     $httpBackend.flush()
 
     $http.get('/1.json', { etagCache: true })
-      .cached(function (data, status, headers, config, itemCache) {
+      .ifCached(function (response, itemCache) {
         var cacheInfo = itemCache.info()
         cacheInfo.id.should.equal('httpEtagCache')
       })
@@ -351,7 +324,7 @@ describe('HTTP Decorator', function () {
     $httpBackend.flush()
 
     $http.get('/1.json', { etagCache: 'testCache' })
-      .cached(function (data, status, headers, config, itemCache) {
+      .ifCached(function (response, itemCache) {
         var cacheInfo = itemCache.info()
         cacheInfo.id.should.equal('testCache')
       })
@@ -367,7 +340,7 @@ describe('HTTP Decorator', function () {
     $httpBackend.flush()
 
     $http.get('/1.json', { etagCache: cacheConfig })
-      .cached(function (data, status, headers, config, itemCache) {
+      .ifCached(function (response, itemCache) {
         var cacheInfo = itemCache.info()
         cacheInfo.id.should.equal('testCache')
       })
@@ -384,7 +357,7 @@ describe('HTTP Decorator', function () {
     $httpBackend.flush()
 
     $http.get('/1.json', { etagCache: cacheConfig })
-      .cached(function (data, status, headers, config, itemCache) {
+      .ifCached(function (response, itemCache) {
         var cacheInfo = itemCache.info()
         cacheInfo.id.should.equal('testCache')
         cacheInfo.itemKey.should.equal('testItemKey')
@@ -399,7 +372,7 @@ describe('HTTP Decorator', function () {
     $httpBackend.flush()
 
     $http.get('/1.json', { etagCache: cache })
-      .cached(function (data, status, headers, config, itemCache) {
+      .ifCached(function (response, itemCache) {
         var cacheInfo = itemCache.info()
         cacheInfo.id.should.equal('testCache')
         cacheInfo.itemKey.should.equal('/1.json')
@@ -414,7 +387,7 @@ describe('HTTP Decorator', function () {
     $httpBackend.flush()
 
     $http.get('/1.json', { etagCache: itemCache })
-      .cached(function (data, status, headers, config, itemCache) {
+      .ifCached(function (response, itemCache) {
         var cacheInfo = itemCache.info()
         cacheInfo.id.should.equal('testCache')
         cacheInfo.itemKey.should.equal('testItemKey')
@@ -438,7 +411,7 @@ describe('HTTP Decorator', function () {
     $httpBackend.flush()
 
     $http.get('/1.json', { etagCache: getCacheConfig })
-      .cached(function (data, status, headers, config, itemCache) {
+      .ifCached(function (response, itemCache) {
         var cacheInfo = itemCache.info()
         cacheInfo.id.should.equal('testCache')
         should.exist(cacheInfo.itemKey)
@@ -459,7 +432,7 @@ describe('HTTP Decorator', function () {
     $httpBackend.flush()
 
     $http.get('/1.json', { etagCache: getCacheConfig })
-      .cached(function (data, status, headers, config, itemCache) {
+      .ifCached(function (response, itemCache) {
         var cacheInfo = itemCache.info()
         cacheInfo.id.should.equal('testCache')
         cacheInfo.itemKey.should.equal('testItemKey')
@@ -472,8 +445,8 @@ describe('HTTP Decorator', function () {
     $httpBackend.flush()
 
     $http.get('/1.json', { etagCache: angular.noop })
-      .cached(cachedSpy)
-      .success(successSpy)
+      .ifCached(cachedSpy)
+      .then(successSpy)
     $httpBackend.flush()
 
     cachedSpy.should.not.have.been.called
@@ -493,8 +466,8 @@ describe('HTTP Decorator', function () {
     $httpBackend.flush()
 
     $http.get('/1.json', { etagCache: false })
-      .cached(cachedSpy)
-      .success(successSpy)
+      .ifCached(cachedSpy)
+      .then(successSpy)
     $httpBackend.flush()
 
     cachedSpy.should.not.have.been.called
@@ -506,7 +479,7 @@ describe('HTTP Decorator', function () {
     $httpBackend.flush()
 
     $http.get('/1.json', { etagCache: 'cacheResponseDataFalseTestCache' })
-      .cached(cachedSpy)
+      .ifCached(cachedSpy)
     $httpBackend.flush()
 
     cachedSpy.should.not.have.been.called
@@ -514,9 +487,8 @@ describe('HTTP Decorator', function () {
 
   it('should gracefully handle a response without an ETag header', function () {
     $http.get('/404.json', { etagCache: true })
-      .cached(cachedSpy)
-      .success(successSpy)
-      .error(errorSpy)
+      .ifCached(cachedSpy)
+      .then(successSpy, errorSpy)
     $httpBackend.flush()
 
     cachedSpy.should.not.have.been.called
@@ -524,9 +496,8 @@ describe('HTTP Decorator', function () {
     errorSpy.should.not.have.been.called
 
     $http.get('/404.json', { etagCache: true })
-      .cached(cachedSpy)
-      .success(successSpy)
-      .error(errorSpy)
+      .ifCached(cachedSpy)
+      .then(successSpy, errorSpy)
     $httpBackend.flush()
 
     cachedSpy.should.not.have.been.called
