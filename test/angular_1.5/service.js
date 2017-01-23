@@ -1,6 +1,7 @@
+/* global angular:false */
+
 'use strict'
 
-var angular = require('angular')
 var chai = require('chai')
 var should = chai.should()
 
@@ -69,7 +70,6 @@ describe('Service', function () {
           })
       }])
 
-    angular.mock.module(require('../lib-test/'))
     angular.mock.module('test')
     angular.mock.inject(function ($injector) {
       httpEtag = $injector.get('httpEtag')

@@ -1,6 +1,6 @@
-var packageData = require('./package.json')
+const packageData = require('./package.json')
 
-export default `/**
+module.exports = `/**
  * ${packageData.name} v${packageData.version}
  * ${packageData.author}, ${new Date().getFullYear()}
  * ${packageData.homepage}

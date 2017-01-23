@@ -11,7 +11,9 @@ export default angular
   .config(['$provide', '$httpProvider', function addHttpEtagInterceptor ($provide, $httpProvider) {
     httpDecorator.useLegacyPromiseExtensions =
       $httpProvider.useLegacyPromiseExtensions ||
-      function useLegacyPromiseExtensions () { return true }
+      function useLegacyPromiseExtensions () {
+        return angular.version.major === 1 && angular.version.minor < 6
+      }
     $provide.decorator('$http', httpDecorator)
     $httpProvider.interceptors.push(httpInterceptor)
   }])

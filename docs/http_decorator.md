@@ -11,6 +11,25 @@ var promise = $http
     etagCache: true
   })
 
+  .then(
+    function successHandler (response, itemCache) {
+      var data = response.data
+      data._fullName = data.first_name + ' ' + data.last_name
+      itemCache.set(data)
+      self.fullName = data._fullName
+    },
+    function errorHandler (response) {
+      if (response.status != 304) alert('Request error')
+    }
+  )
+
+  .ifCached(function (response, itemCache) {
+    self.fullName = response.data._fullName
+  })
+
+// Or, the old fashioned 1.5 and before way:
+// (The above then/ifCached way will work even on older versions of Angular)
+promise
   .success(function (data, status, headers, config, itemCache) {
     // Modify the data from the server
     data._fullName = data.first_name + ' ' + data.last_name
@@ -28,19 +47,6 @@ var promise = $http
 
   .error(function (data, status) {
     if (status != 304) alert('Request error')
-  })
-
-// Or, without using legacy promise extensions:
-// (`cached` method gets deprecated with the native extensions)
-promise
-  .then(function successHandler (response, itemCache) {
-    var data = response.data
-    data._fullName = data.first_name + ' ' + data.last_name
-    itemCache.set(data)
-    self.fullName = data._fullName
-  })
-  .ifCached(function (response, itemCache) {
-    self.fullName = response.data._fullName
   })
 ```
 

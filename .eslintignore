@@ -2,3 +2,4 @@ lib-test/
 lib/
 release/
 coverage/
+vendor/

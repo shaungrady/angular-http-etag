@@ -18,6 +18,7 @@ Easy ETag-based caching for `$http` service requests! Increase responsiveness, d
 * Caches response data with flexible cache configuration.
 * Support for `$cacheFactory`, `sessionStorage`, and `localStorage` caches out-of-the-box.
 * Easily [adaptable][Cache Service Adapters] for other third-party cache services.
+* Compatible with Angular 1.2–1.6.
 
 **Example Usage:**
 
@@ -40,30 +41,21 @@ angular
       .get('/my_data.json', {
         etagCache: 'persistentCache'
       })
-      .success(function (data, status, headers, config, itemCache) {
+      .then(function success (response, itemCache) {
+        var data = response.data
         // Modify the data from the server
         data._fullName = data.first_name + ' ' + data.last_name
         // Update the cache with the modified data
         itemCache.set(data)
         // Assign to controller property
         self.fullName = data._fullName
+      }, function error (response) {
+        if (response.status != 304) alert('Request error')
       })
       // Synchronous method called if request was previously cached
       // status == 'cached'; headers === undefined;
-      .cached(function (data, status, headers, config, itemCache) {
+      .ifCached(function (response, itemCache) {
         self.fullName = data._fullName
-      })
-      .error(function (data, status) {
-        // 304: 'Not Modified'--Etag matched, cached data is fresh
-        if (status != 304) alert('Request error')
-      })
-
-      // Also wraps then method:
-      .then(function successHandler (response, itemCache) {
-        // ...
-      })
-      .cached(function (data, status, headers, config, itemCache) {
-        // ...
       })
   })
 ```
@@ -149,12 +141,12 @@ Using the default cache with default configuration and an automatically generate
 $http.get('/data', {
     etagCache: true
   })
-  .cached(responseHandler)
-  .success(responseHandler)
+  .then(responseHandler)
+  .ifCached(responseHandler)
 
-function responseHandler (data, status, headers, config, itemCache) {
+function responseHandler (response, itemCache) {
   // Differentiating between cached and successful request responses
-  var isCached = status === 'cached'
+  var isCached = response.status === 'cached'
 
   // itemCache is a cache object bound to the cache item associated with this request.
   itemCache.info()
@@ -173,10 +165,10 @@ Using a defined cache from the previous section and an automatically generated c
 $http.get('/data', {
     etagCache: 'persistentCache'
   })
-  .cached(responseHandler)
-  .success(responseHandler)
+  .then(responseHandler)
+  .ifCached(responseHandler)
 
-function responseHandler (data, status, headers, config, itemCache) {
+function responseHandler (response, itemCache) {
   itemCache.info()
   // { id: 'persistentCache',
   //   itemKey: '/data',
@@ -195,10 +187,10 @@ $http.get('/data', {
       itemKey: 'whatFineKeyYouHave'
     }
   })
-  .cached(responseHandler)
-  .success(responseHandler)
+  .then(responseHandler)
+  .ifCached(responseHandler)
 
-function responseHandler (data, status, headers, config, itemCache) {
+function responseHandler (response, itemCache) {
   itemCache.info()
   // { id: 'persistentCache',
   //   itemKey: 'whatFineKeyYouHave',
