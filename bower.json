@@ -36,6 +36,6 @@
     "coverage"
   ],
   "dependencies": {
-    "angular": ">=1.2 <1.6"
+    "angular": ">=1.2 <1.7"
   }
 }
