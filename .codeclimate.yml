@@ -4,6 +4,8 @@ engines:
     channel: "eslint-3"
     config:
       config: .eslintrc.json
+    exlude_paths:
+    - "test/"
 
 ratings:
   paths:
