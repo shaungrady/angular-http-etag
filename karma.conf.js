@@ -1,10 +1,11 @@
 const path = require('path')
 
 // Determine which version of Angular we're running the tests for. (--ng 1.6)
+// If none is specified, default to running tests for Angular 1.6.
 const args = process.argv.slice(2)
 let index = args.indexOf('--ng')
 const ngVersion = index > -1 ? args[index + 1] : '1.6'
-const ngConfig = require(`./test/karma.config.angular-${ngVersion}.js`)
+const ngConfig = require(`./karma.config.angular-${ngVersion}.js`)
 console.log('Karma: Running tests for Angular', ngVersion)
 
 // Config
