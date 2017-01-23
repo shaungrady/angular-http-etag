@@ -10,6 +10,6 @@ addons:
     packages:
       - g++-4.8
 
-# after_script:
-# - codeclimate-test-reporter < coverage/lcov.info
+after_script:
+- codeclimate-test-reporter < coverage/lcov.info
 # - npm run test-saucelabs

@@ -1,3 +1,5 @@
+const path = require('path')
+
 // Determine which version of Angular we're running the tests for. (--ng 1.6)
 const args = process.argv.slice(2)
 let index = args.indexOf('--ng')
@@ -22,13 +24,28 @@ module.exports = function (config) {
       externals: {
         angular: 'angular'
       },
+      module: {
+        rules: [{
+          test: /\.js$/,
+          include: path.resolve(__dirname, 'src'),
+          exclude: /node_modules/,
+          enforce: 'post',
+          loader: 'istanbul-instrumenter-loader',
+          options: {
+            esModules: true
+          }
+        }]
+      },
       devtool: 'inline-source-map'
     },
     webpackMiddleware: {
       stats: 'minimal'
     },
 
-    reporters: ['progress'],
+    reporters: ['progress', 'coverage'],
+
+    coverageReporter: ngConfig.coverageReporter,
+
     port: 9876,
     colors: true,
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
