@@ -14,14 +14,15 @@ module.exports = function (config) {
     exclude: [],
 
     preprocessors: {
-      'src/index.js': ['webpack'],
-      'test/**/index.js': ['webpack']
+      'src/index.js': ['webpack', 'sourcemap'],
+      'test/**/index.js': ['webpack', 'sourcemap']
     },
 
     webpack: {
       externals: {
         angular: 'angular'
-      }
+      },
+      devtool: 'inline-source-map'
     },
     webpackMiddleware: {
       stats: 'minimal'
