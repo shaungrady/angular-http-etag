@@ -1,5 +1,5 @@
 /**
- * angular-http-etag v2.0.14
+ * angular-http-etag v2.0.15
  * Shaun Grady (http://shaungrady.com), 2017
  * https://github.com/shaungrady/angular-http-etag
  * Module Format: Universal Module Definition
@@ -1249,7 +1249,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
   .config(['$provide', '$httpProvider', function addHttpEtagInterceptor ($provide, $httpProvider) {
     __WEBPACK_IMPORTED_MODULE_2__httpDecorator__["a" /* default */].useLegacyPromiseExtensions =
       $httpProvider.useLegacyPromiseExtensions ||
-      function useLegacyPromiseExtensions () { return true }
+      function useLegacyPromiseExtensions () {
+        return __WEBPACK_IMPORTED_MODULE_0_angular___default.a.version.major === 1 && __WEBPACK_IMPORTED_MODULE_0_angular___default.a.version.minor < 6
+      }
     $provide.decorator('$http', __WEBPACK_IMPORTED_MODULE_2__httpDecorator__["a" /* default */])
     $httpProvider.interceptors.push(__WEBPACK_IMPORTED_MODULE_3__httpInterceptor__["a" /* default */])
   }])
