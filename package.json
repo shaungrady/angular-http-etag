@@ -7,13 +7,13 @@
   "license": "MIT",
   "main": "./lib",
   "scripts": {
-    "bundle": "webpack",
+    "bundle": "webpack && npm run bundle-umd",
     "bundle-umd": "webpack --config webpack.config.browser.js && webpack --config webpack.config.browser-min.js",
     "test": "karma start && karma start --ng 1.5",
     "test-start": "karma start --no-single-run",
     "patch": "npm version patch -m '%s'",
     "preversion": "npm run test",
-    "version": "rm -rf lib/ release/ && npm run bundle && npm run bundle-umd && git add -A lib/ release/"
+    "version": "rm -rf lib/ release/ && npm run bundle && git add -A lib/ release/"
   },
   "repository": {
     "type": "git",
