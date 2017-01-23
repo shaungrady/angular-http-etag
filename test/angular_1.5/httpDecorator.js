@@ -1,3 +1,5 @@
+/* global angular:false */
+
 'use strict'
 
 var chai = require('chai')
