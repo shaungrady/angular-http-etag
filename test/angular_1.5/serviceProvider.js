@@ -1,6 +1,5 @@
 'use strict'
 
-var angular = require('angular')
 var chai = require('chai')
 var expect = chai.expect
 chai.should()
@@ -16,7 +15,6 @@ describe('Service Provider', function () {
         httpEtagProvider = __httpEtagProvider
       }])
 
-    angular.mock.module(require('../lib-test/'))
     angular.mock.module('test')
     angular.mock.inject(function ($injector) {
       httpEtag = $injector.get('httpEtag')

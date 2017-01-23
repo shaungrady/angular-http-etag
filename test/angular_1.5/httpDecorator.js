@@ -1,6 +1,5 @@
 'use strict'
 
-var angular = require('angular')
 var chai = require('chai')
 var spies = require('chai-spies'); chai.use(spies)
 var expect = chai.expect
@@ -51,7 +50,6 @@ describe('HTTP Decorator', function () {
           })
       }])
 
-    angular.mock.module(require('../lib-test/'))
     angular.mock.module('test')
     angular.mock.inject(function ($injector) {
       httpEtag = $injector.get('httpEtag')
