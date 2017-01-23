@@ -9,5 +9,9 @@ describe('angular-http-etag', function () {
       angular.version.major.should.equal(1)
       angular.version.minor.should.equal(6)
     })
+
+    require('./serviceProvider')
+    require('./service')
+    require('./httpDecorator')
   })
 })
