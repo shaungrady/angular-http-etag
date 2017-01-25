@@ -9,7 +9,7 @@
   "scripts": {
     "bundle": "webpack && npm run bundle-umd",
     "bundle-umd": "webpack --config webpack.config.browser.js && webpack --config webpack.config.browser-min.js",
-    "test": "karma start && karma start --ng 1.5",
+    "test": "karma start && karma start --ng 1.5 && eslint .",
     "test-start": "karma start --no-single-run",
     "pretest": "rm -rf coverage/",
     "posttest": "istanbul-combine -r lcov -r html coverage/angular_*/**/*.json",
