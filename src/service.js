@@ -30,6 +30,7 @@ function httpEtagProvider () {
   var defaultEtagCacheConfig = {
     deepCopy: false,
     cacheResponseData: true,
+    cacheResponseHeaders: false,
     cacheService: '$cacheFactory',
     cacheOptions: {
       number: 25

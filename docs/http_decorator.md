@@ -41,7 +41,7 @@ promise
 
   .cached(function (data, status, headers, config, itemCache) {
     // status === 'cached'
-    // headers === undefined
+    // headers === undefined (default) or header === function() (read docs below)
     self.fullName = data._fullName
   })
 
@@ -57,7 +57,9 @@ Instead of being asynchronous like `success` and `error` are, `cached` is synchr
 If the request being made has previously cached data associated with it, `cached`
 will be called immediately and the cached data response data will be returned
 in the `data` argument. Since it's not a true server response, the `status` argument
-is set to `'cached'` instead of an HTTP Status Code, and `headers` is `undefined`.
+is set to `'cached'` instead of an HTTP Status Code.
+By default `headers` is `undefined`, this behavious can be changed by using the `cacheResponseHeaders`
+option in the default cache config, setting it to true will return the headers as they appear in the normal response (as a function).
 The `config` argument will return the `$http` config as normal.
 
 Lastly, an `itemCache` is passed in as the 5th argument allowing for easily

@@ -30,6 +30,7 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
         var rawCacheData = itemCache.$get()
         var cachedEtag = rawCacheData && rawCacheData.etagHeader
         var cachedResponse = cachedEtag && rawCacheData.responseData
+        var cachedHeaders = cachedEtag && rawCacheData.responseHeaders
 
         // Allow easy access to cache in interceptor
         httpConfig.$$_itemCache = itemCache
@@ -52,7 +53,7 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
       if (useLegacyPromiseExtensions) {
         httpPromise.cached = function httpEtagPromiseCached (callback) {
           if (rawCacheData && cacheInfo.cacheResponseData) {
-            callback(cachedResponse, 'cached', undefined, httpConfig, itemCache)
+            callback(cachedResponse, 'cached', cachedHeaders ? function () { return cachedHeaders } : undefined, httpConfig, itemCache)
           }
           return httpPromise
         }
@@ -67,7 +68,7 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
           callback({
             data: cachedResponse,
             status: 'cached',
-            headers: undefined,
+            headers: cachedHeaders ? function () { return cachedHeaders } : undefined,
             config: httpConfig
           }, itemCache)
         }
