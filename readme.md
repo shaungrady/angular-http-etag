@@ -4,8 +4,8 @@
 [![Build Status](https://travis-ci.org/shaungrady/angular-http-etag.svg?branch=master)](https://travis-ci.org/shaungrady/angular-http-etag)
 [![Test Coverage](https://codeclimate.com/github/shaungrady/angular-http-etag/badges/coverage.svg)](https://codeclimate.com/github/shaungrady/angular-http-etag/coverage)
 [![Code Climate](https://codeclimate.com/github/shaungrady/angular-http-etag/badges/gpa.svg)](https://codeclimate.com/github/shaungrady/angular-http-etag)  
-[![Dependency Status](https://david-dm.org/shaungrady/angular-http-etag.svg)](https://david-dm.org/shaungrady/angular-http-etag)
-[![devDependency Status](https://david-dm.org/shaungrady/angular-http-etag/dev-status.svg)](https://david-dm.org/shaungrady/angular-http-etag#info=devDependencies)
+[![dependencies Status](https://david-dm.org/shaungrady/angular-http-etag/status.svg)](https://david-dm.org/shaungrady/angular-http-etag)
+[![peerDependencies Status](https://david-dm.org/shaungrady/angular-http-etag/peer-status.svg)](https://david-dm.org/shaungrady/angular-http-etag?type=peer)
 [![JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
 
 Tested: IE 9+; Edge 13; Chrome 29, 50+; Firefox 46+; Safari 7+; iOS 9.2+; Android 4.4, 5.1.
