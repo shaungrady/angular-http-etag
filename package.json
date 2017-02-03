@@ -5,7 +5,9 @@
   "homepage": "https://github.com/shaungrady/angular-http-etag",
   "author": "Shaun Grady (http://shaungrady.com)",
   "license": "MIT",
-  "main": "./lib",
+  "main": "lib/index.js",
+  "module": "src/index.js",
+  "jsnext:main": "src/index.js",
   "scripts": {
     "bundle": "webpack && npm run bundle-umd",
     "bundle-umd": "webpack --config webpack.config.browser.js && webpack --config webpack.config.browser-min.js",
@@ -69,6 +71,7 @@
     "webpack": "^2.2"
   },
   "files": [
+    "src/*.js",
     "lib/*.js",
     "release/angular-http-etag.js",
     "readme.md"
