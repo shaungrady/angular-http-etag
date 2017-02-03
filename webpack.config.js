@@ -16,7 +16,7 @@ module.exports = {
     path: './lib',
     filename: 'index.js',
     library: 'http-etag',
-    libraryTarget: 'commonjs'
+    libraryTarget: 'commonjs2'
   },
   plugins: [
     new webpack.BannerPlugin({ banner, raw: true, entryOnly: true })
