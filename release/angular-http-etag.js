@@ -1,5 +1,5 @@
 /**
- * angular-http-etag v2.0.15
+ * angular-http-etag v2.0.16
  * Shaun Grady (http://shaungrady.com), 2017
  * https://github.com/shaungrady/angular-http-etag
  * Module Format: Universal Module Definition
