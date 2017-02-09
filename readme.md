@@ -1,5 +1,7 @@
 # Angular HTTP ETag
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/shaungrady/angular-http-etag.svg)](https://greenkeeper.io/)
+
 [![npm version](https://badge.fury.io/js/angular-http-etag.svg)](http://badge.fury.io/js/angular-http-etag)
 [![Build Status](https://travis-ci.org/shaungrady/angular-http-etag.svg?branch=master)](https://travis-ci.org/shaungrady/angular-http-etag)
 [![Test Coverage](https://codeclimate.com/github/shaungrady/angular-http-etag/badges/coverage.svg)](https://codeclimate.com/github/shaungrady/angular-http-etag/coverage)
