@@ -74,6 +74,7 @@
     "src/*.js",
     "lib/*.js",
     "release/angular-http-etag.js",
-    "readme.md"
+    "readme.md",
+    "LICENSE.md"
   ]
 }
