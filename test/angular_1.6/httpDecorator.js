@@ -1,4 +1,5 @@
 /* global angular:false */
+/* eslint no-unused-expressions: "off" */
 
 'use strict'
 
