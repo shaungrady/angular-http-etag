@@ -64,6 +64,8 @@ function httpEtagHttpDecorator ($delegate, httpEtag) {
 
       httpPromise.ifCached = function httpEtagPromiseIfCached (callback) {
         if (rawCacheData && cacheInfo.cacheResponseData) {
+          // We're simply mimicking the Angular API here, so... sorry, Standard.
+          // eslint-disable-next-line standard/no-callback-literal
           callback({
             data: cachedResponse,
             status: 'cached',
