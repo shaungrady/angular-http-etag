@@ -7,7 +7,7 @@ cache services.
 
 ``` javascript
 angular
-  .module('myModule', ['angular-http-etag'])
+  .module('myModule', ['http-etag'])
   .config(function(httpEtagProvider) {
 
     httpEtagProvider
