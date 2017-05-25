@@ -1,12 +1,14 @@
 # Angular HTTP ETag
 
-[![npm version](https://badge.fury.io/js/angular-http-etag.svg)](http://badge.fury.io/js/angular-http-etag)
-[![Build Status](https://travis-ci.org/shaungrady/angular-http-etag.svg?branch=master)](https://travis-ci.org/shaungrady/angular-http-etag)
-[![Test Coverage](https://codeclimate.com/github/shaungrady/angular-http-etag/badges/coverage.svg)](https://codeclimate.com/github/shaungrady/angular-http-etag/coverage)
-[![Code Climate](https://codeclimate.com/github/shaungrady/angular-http-etag/badges/gpa.svg)](https://codeclimate.com/github/shaungrady/angular-http-etag)  
-[![dependencies Status](https://david-dm.org/shaungrady/angular-http-etag/status.svg)](https://david-dm.org/shaungrady/angular-http-etag)
-[![peerDependencies Status](https://david-dm.org/shaungrady/angular-http-etag/peer-status.svg)](https://david-dm.org/shaungrady/angular-http-etag?type=peer)
-[![JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
+[![GitHub release](https://img.shields.io/github/release/shaungrady/angular-http-etag.svg?style=flat-square)](https://github.com/shaungrady/angular-http-etag/releases)
+[![npm](https://img.shields.io/npm/v/angular-http-etag.svg?style=flat-square)](https://www.npmjs.com/package/angular-http-etag)
+[![npm](https://img.shields.io/npm/dm/angular-http-etag.svg?style=flat-square)](https://www.npmjs.com/package/angular-http-etag)
+[![JS style](https://img.shields.io/badge/js%20style-standard-orange.svg?style=flat-square)](https://standardjs.com/)  
+[![Travis](https://img.shields.io/travis/shaungrady/angular-http-etag.svg?style=flat-square)](https://travis-ci.org/shaungrady/angular-http-etag)
+[![Code Climate](https://img.shields.io/codeclimate/github/shaungrady/angular-http-etag.svg?style=flat-square)](https://codeclimate.com/github/shaungrady/angular-http-etag)
+[![Code Climate](https://img.shields.io/codeclimate/coverage/github/shaungrady/angular-http-etag.svg?style=flat-square)](https://codeclimate.com/github/shaungrady/angular-http-etag/coverage)
+[![David](https://img.shields.io/david/shaungrady/angular-http-etag.svg?style=flat-square)](https://david-dm.org/shaungrady/angular-http-etag)
+[![David](https://img.shields.io/david/peer/shaungrady/angular-http-etag.svg?style=flat-square)](https://david-dm.org/shaungrady/angular-http-etag?type=peer)
 
 Tested: IE 9+; Edge 13; Chrome 29, 50+; Firefox 46+; Safari 7+; iOS 9.2+; Android 4.4, 5.1.
 
