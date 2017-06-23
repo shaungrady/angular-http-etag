@@ -2,19 +2,22 @@ const { resolve } = require('path')
 const webpack = require('webpack')
 
 // Banner
-const bannerTemplate = require(resolve('./webpack.banner.js'))
+const bannerTemplate = require(resolve(__dirname, 'webpack.banner.js'))
 const banner = bannerTemplate.replace('<module_format>', 'CommonJS')
 
 // Get externals from package.json dependencies
-const dependencies = Object.keys(require(resolve('./package.json')).dependencies).concat(['angular'])
 const externals = {}
+const dependencies = Object
+  .keys(require(resolve('package.json')).dependencies)
+  .concat(['angular'])
+
 dependencies.forEach((dep) => { externals[dep] = dep })
 
 // Export config
 module.exports = {
-  entry: resolve('./src/index.js'),
+  entry: resolve('src/index.js'),
   output: {
-    path: resolve('./lib'),
+    path: resolve('lib'),
     filename: 'index.js',
     library: 'http-etag',
     libraryTarget: 'commonjs2'
