@@ -1,9 +1,10 @@
 language: node_js
 cache:
   directories:
-  - node_modules
+    - $HOME/.npm
+    - node_modules
 node_js:
-- '8'
+  - node
 env:
   - CXX=g++-4.8
 addons:
@@ -13,6 +14,13 @@ addons:
     packages:
       - g++-4.8
 
+before_install:
+  - npm config set spin false
+  - npm install -g npm@^5
+install:
+  - npm install
+script:
+  - npm run bundle
+  - npm run test
 after_script:
-- codeclimate-test-reporter < coverage/lcov.info
-# - npm run test-saucelabs
+  - codeclimate-test-reporter < coverage/lcov.info
