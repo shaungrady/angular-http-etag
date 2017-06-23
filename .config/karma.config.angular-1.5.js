@@ -12,6 +12,6 @@ module.exports = {
 
   coverageReporter: {
     type: 'json',
-    dir: 'coverage/angular_1.5'
+    dir: resolve('coverage/angular_1.5')
   }
 }
