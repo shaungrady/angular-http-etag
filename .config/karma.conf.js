@@ -1,12 +1,13 @@
-const path = require('path')
+const { resolve } = require('path')
 
 // Determine which version of Angular we're running the tests for. (--ng 1.6)
 // If none is specified, default to running tests for Angular 1.6.
 const args = process.argv.slice(2)
-let index = args.indexOf('--ng')
+const index = args.indexOf('--ng')
 const ngVersion = index > -1 ? args[index + 1] : '1.6'
 const ngConfig = require(`./karma.config.angular-${ngVersion}.js`)
-console.log('Karma: Running tests for Angular', ngVersion)
+
+console.log('\n\x1b[36mKarma: Running tests for Angular', ngVersion, '\x1b[0m')
 
 // Config
 module.exports = function (config) {
@@ -17,8 +18,8 @@ module.exports = function (config) {
     exclude: [],
 
     preprocessors: {
-      'src/index.js': ['webpack', 'sourcemap'],
-      'test/**/index.js': ['webpack', 'sourcemap']
+      '../src/index.js': ['webpack', 'sourcemap'],
+      '../test/**/index.js': ['webpack', 'sourcemap']
     },
 
     webpack: {
@@ -28,7 +29,7 @@ module.exports = function (config) {
       module: {
         rules: [{
           test: /\.js$/,
-          include: path.resolve(__dirname, 'src'),
+          include: resolve('src'),
           exclude: /node_modules/,
           enforce: 'post',
           loader: 'istanbul-instrumenter-loader',
