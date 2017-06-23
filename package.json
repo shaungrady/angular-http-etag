@@ -9,8 +9,8 @@
   "module": "src/index.js",
   "jsnext:main": "src/index.js",
   "scripts": {
-    "bundle": "webpack && npm run bundle-umd",
-    "bundle-umd": "webpack --config webpack.config.browser.js && webpack --config webpack.config.browser-min.js",
+    "bundle": "webpack --config .config/webpack.config.js && npm run bundle-umd",
+    "bundle-umd": "webpack --config .config/webpack.config.browser.js && webpack --config .config/webpack.config.browser-min.js",
     "test": "karma start && karma start --ng 1.5 && eslint .",
     "test-start": "karma start --no-single-run",
     "pretest": "rm -rf coverage/",
