@@ -20,7 +20,7 @@ Easy ETag-based caching for `$http` service requests! Increase responsiveness, d
 * Caches response data with flexible cache configuration.
 * Support for `$cacheFactory`, `sessionStorage`, and `localStorage` caches out-of-the-box.
 * Easily [adaptable][Cache Service Adapters] for other third-party cache services.
-* Compatible with Angular 1.2–1.6.
+* Compatible with AngularJS 1.2–1.6.
 
 **Example Usage:**
 
