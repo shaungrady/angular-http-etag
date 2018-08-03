@@ -15,12 +15,16 @@ dependencies.forEach((dep) => { externals[dep] = dep })
 
 // Export config
 module.exports = {
+  mode: 'production',
   entry: resolve('src/index.js'),
   output: {
     path: resolve('lib'),
     filename: 'index.js',
     library: 'http-etag',
     libraryTarget: 'commonjs2'
+  },
+  optimization: {
+    minimize: false
   },
   plugins: [
     new webpack.BannerPlugin({ banner, raw: true, entryOnly: true })
