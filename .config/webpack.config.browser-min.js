@@ -7,10 +7,8 @@ const banner = require(resolve(__dirname, 'webpack.banner-min.js'))
 config.output.filename = 'angular-http-etag.min.js'
 config.output.libraryTarget = 'umd'
 config.devtool = 'source-map'
+config.optimization.minimize = true
 config.plugins = [
-  new webpack.optimize.UglifyJsPlugin({
-    sourceMap: true
-  }),
   new webpack.BannerPlugin({ banner, raw: true, entryOnly: true })
 ]
 

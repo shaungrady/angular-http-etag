@@ -54,7 +54,7 @@ describe('HTTP Decorator', function () {
       }])
 
     angular.mock.module('test')
-    angular.mock.inject(function ($injector) {
+    angular.mock.inject(['$injector', function ($injector) {
       httpEtag = $injector.get('httpEtag')
       $http = $injector.get('$http')
       $httpBackend = $injector.get('$httpBackend')
@@ -86,7 +86,7 @@ describe('HTTP Decorator', function () {
       $httpBackend
         .whenGET('/404.json')
         .respond(mockResponseData)
-    })
+    }])
   })
 
   it('should have same properties/methods as undecorated $http service', function () {

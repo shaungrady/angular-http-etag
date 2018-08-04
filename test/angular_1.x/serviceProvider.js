@@ -18,9 +18,9 @@ describe('Service Provider', function () {
       }])
 
     angular.mock.module('test')
-    angular.mock.inject(function ($injector) {
+    angular.mock.inject(['$injector', function ($injector) {
       httpEtag = $injector.get('httpEtag')
-    })
+    }])
   })
 
   it('should allow for getting default cache creation config', function () {
