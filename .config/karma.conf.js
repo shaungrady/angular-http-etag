@@ -21,6 +21,8 @@ module.exports = function (config) {
     },
 
     webpack: {
+      mode: 'production',
+      target: 'node',
       externals: {
         angular: 'angular'
       },
@@ -50,7 +52,7 @@ module.exports = function (config) {
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
-    browsers: ['PhantomJS'],
+    browsers: ['ChromeHeadless'],
     singleRun: true,
     concurrency: Infinity
   })
