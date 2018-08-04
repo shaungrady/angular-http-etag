@@ -5,8 +5,7 @@
 [![npm](https://img.shields.io/npm/dm/angular-http-etag.svg?style=flat-square)](https://www.npmjs.com/package/angular-http-etag)
 [![JS style](https://img.shields.io/badge/js%20style-standard-orange.svg?style=flat-square)](https://standardjs.com/)  
 [![Travis](https://img.shields.io/travis/shaungrady/angular-http-etag.svg?style=flat-square)](https://travis-ci.org/shaungrady/angular-http-etag)
-[![Code Climate](https://img.shields.io/codeclimate/github/shaungrady/angular-http-etag.svg?style=flat-square)](https://codeclimate.com/github/shaungrady/angular-http-etag)
-[![Code Climate](https://img.shields.io/codeclimate/coverage/github/shaungrady/angular-http-etag.svg?style=flat-square)](https://codeclimate.com/github/shaungrady/angular-http-etag/coverage)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/cd179568de4ea601823f/test_coverage)](https://codeclimate.com/github/shaungrady/angular-http-etag/test_coverage)
 [![David](https://img.shields.io/david/shaungrady/angular-http-etag.svg?style=flat-square)](https://david-dm.org/shaungrady/angular-http-etag)
 [![David](https://img.shields.io/david/peer/shaungrady/angular-http-etag.svg?style=flat-square)](https://david-dm.org/shaungrady/angular-http-etag?type=peer)
 
